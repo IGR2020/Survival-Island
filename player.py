@@ -11,6 +11,7 @@ class Player(pg.Rect):
         self.maxSpeed = 5
         self.isMovingH = False
         self.isMovingV = False
+        self.inventory = []
         return super().__init__(x, y, assets[self.name].get_width(), assets[self.name].get_height())
    
      def display(self, window: pg.Surface, x_offset=0, y_offset=0):

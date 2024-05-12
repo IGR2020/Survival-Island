@@ -38,6 +38,16 @@ while run:
         if event.type == pg.QUIT:
             run = False
 
+        if event.type == pg.MOUSEBUTTONDOWN:
+            offset_mouse_x, offset_mouse_y = pg.mouse.get_pos()
+            offset_mouse_x += x_offset
+            offset_mouse_y += y_offset
+            for structure in structures:
+                if structure.collidepoint((offset_mouse_x, offset_mouse_y)):
+                    gain = structure.destroy()
+                    if gain is not None:
+                        player.inventory.append(gain)
+
     keys = pg.key.get_pressed()
 
     if keys[pg.K_a]:
