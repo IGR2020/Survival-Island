@@ -3,7 +3,7 @@ from assets import assets
 
 class Player(pg.Rect):
 
-     def __init__(self, x, y, width, height, name) -> None:
+     def __init__(self, x, y, name) -> None:
         self.name = name
         self.x_vel = 0
         self.y_vel = 0
@@ -11,7 +11,7 @@ class Player(pg.Rect):
         self.maxSpeed = 5
         self.isMovingH = False
         self.isMovingV = False
-        return super().__init__(x, y, width, height)
+        return super().__init__(x, y, assets[self.name].get_width(), assets[self.name].get_height())
    
      def display(self, window: pg.Surface, x_offset=0, y_offset=0):
         window.blit(assets[self.name], (self.x - x_offset, self.y - y_offset))
@@ -38,9 +38,21 @@ class Player(pg.Rect):
      def stopMovingV(self):
          self.y_vel = 0
 
-     def script(self):
-        self.x += self.x_vel
+     def script(self, land):
         self.y += self.y_vel
+        for block in land:
+            if block.name in ("Calm Water.png", "Calm Moderate Water.png", "Calm Deep Water.png", "Water.png") and self.colliderect(block):
+                if self.y_vel < 0:
+                    self.top = block.bottom
+                else:
+                    self.bottom = block.top
+        self.x += self.x_vel
+        for block in land:
+            if block.name in ("Calm Water.png", "Calm Moderate Water.png", "Calm Deep Water.png", "Water.png") and self.colliderect(block):
+                if self.x_vel < 0:
+                    self.left = block.right
+                else:
+                    self.right = block.left
         if not self.isMovingH:
             self.stopMovingH()
         else:

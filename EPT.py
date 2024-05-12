@@ -35,13 +35,17 @@ class Button(pygame.Rect):
         win.blit(self.image, self)
 
 
-def load_assets(path, size: int = None):
+def load_assets(path, size: int = None, scale: float = None):
     sprites = {}
     for file in listdir(path):
         if not isfile(join(path, file)):
             continue
-        if size is None:
+        if size is None and scale is None:
             sprites[file] = pygame.image.load(join(path, file))
+        elif scale is not None:
+            sprites[file] = pygame.transform.scale_by(
+                pygame.image.load(join(path, file)), scale
+            )
         else:
             sprites[file] = pygame.transform.scale(
                 pygame.image.load(join(path, file)), size

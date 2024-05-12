@@ -4,3 +4,4 @@ Version Alpha 1
     + player movement
     + image land extraction
     + spawn point setting
+    + tree spawning

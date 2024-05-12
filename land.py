@@ -1,8 +1,8 @@
 from assets import *
 import perlin_noise
-from objects import Block
+from objects import Block, Structure
 from PIL import Image
-from random import randint
+from random import randint, choice
 
 def generate_island(size: tuple[int, int]) -> list:
     noise = perlin_noise.PerlinNoise()
@@ -16,12 +16,13 @@ def generate_island(size: tuple[int, int]) -> list:
                 land.append(Block(x*blockSize, y*blockSize, blockSize, "Water.png"))
     return land
 
-def get_land_from_image(image_path, water_land_check=True) -> list:
+def get_land_from_image(image_path, water_land_check=True) -> tuple[list, tuple, list]:
     """Scans a image and creates a land aproximate and also returns a spawn point if lime green is present.\n
     Sand recomended R.G.B is 239r, 228g, 176b.\n
     Water recomended R.G.B is 0r, 162g, 232b.\n
     Spawn point recomended R.G.B is 181r, 230g, 29b"""
     land = []
+    structures = []
     spawn_point = (0, 0)
     image = Image.open(image_path)
     image = image.convert("RGBA")
@@ -33,6 +34,7 @@ def get_land_from_image(image_path, water_land_check=True) -> list:
             if data[x, y] == (239, 228, 176, 255):
                if randint(0, 1) == 0: land.append(Block(x*blockSize, y*blockSize, blockSize, "Sand.png"))
                else: land.append(Block(x*blockSize, y*blockSize, blockSize, "Flat Sand.png"))
+               if randint(0, 40) == 0: structures.append(Structure(x*blockSize, y*blockSize, choice(("Palm Tree1.png", "Palm Tree2.png", "Palm Tree3.png"))))
             elif data[x, y] == (181, 230, 29, 255):
                 land.append(Block(x*blockSize, y*blockSize, blockSize, "Spawn Point.png"))
                 spawn_point = (x*blockSize, y*blockSize)
@@ -58,7 +60,7 @@ def get_land_from_image(image_path, water_land_check=True) -> list:
                     continue
                 land.append(get_water_type_by_noise(x, y, sea_noise))
 
-    return land, spawn_point
+    return land, spawn_point, structures
 
 def get_water_type_by_noise(x, y, sea_noise):
     if abs(sea_noise((x*landChaos, y*landChaos))) > 0.2:

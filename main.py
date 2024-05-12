@@ -12,15 +12,18 @@ FPS = 60
 
 x_offset, y_offset = 0, 0
 
-player = Player(100, 100, 10, 10, "Player1.png")
-land, player.topleft = get_land_from_image("assets/land presets/Island1.png", True)
+player = Player(100, 100, "Player1.png")
+land, player.topleft, structures = get_land_from_image("assets/land presets/Island1.png", True)
 
 def display():
 
-    window.fill((200, 120, 90))
+    window.fill((29, 117, 139))
 
     for block in land:
         block.display(window, x_offset, y_offset)
+
+    for structure in structures:
+        structure.display(window, x_offset, y_offset)
 
     player.display(window, x_offset, y_offset)
 
@@ -50,7 +53,7 @@ while run:
         player.moveDown()
         player.isMovingV = True
 
-    player.script()
+    player.script(land)
 
     x_offset, y_offset = player.x-WIDTH/2, player.y-HEIGHT/2
 
