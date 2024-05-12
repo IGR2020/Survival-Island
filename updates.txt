@@ -1,3 +1,6 @@
-
-    Version Alpha 1
-    tree and player assets
+Version Alpha 1
+    + tree and player assets
+    + terrain generation
+    + player movement
+    + image land extraction
+    + spawn point setting
