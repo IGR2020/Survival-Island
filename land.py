@@ -34,7 +34,7 @@ def get_land_from_image(image_path, water_land_check=True) -> tuple[list, tuple,
             if data[x, y] == (239, 228, 176, 255):
                if randint(0, 1) == 0: land.append(Block(x*blockSize, y*blockSize, blockSize, "Sand.png"))
                else: land.append(Block(x*blockSize, y*blockSize, blockSize, "Flat Sand.png"))
-               if randint(0, 40) == 0: structures.append(Structure(x*blockSize, y*blockSize, choice(("Palm Tree1.png", "Palm Tree2.png", "Palm Tree3.png")), Item("Wood", randint(1, 6))))
+               if randint(0, 40) == 0: structures.append(Structure(x*blockSize, y*blockSize, choice(("Palm Tree1.png", "Palm Tree2.png", "Palm Tree3.png")), Item("Wood.png", randint(1, 6))))
             elif data[x, y] == (181, 230, 29, 255):
                 land.append(Block(x*blockSize, y*blockSize, blockSize, "Spawn Point.png"))
                 spawn_point = (x*blockSize, y*blockSize)

@@ -1,5 +1,6 @@
 import pygame as pg
 from assets import assets
+from objects import Item
 
 class Player(pg.Rect):
 
@@ -64,4 +65,13 @@ class Player(pg.Rect):
             self.isMovingV = False
           
 
-   
+def agrivate_inventory(inv1, inv2):
+    aggrivated_inv = []
+    if len(inv1) == 0:
+        aggrivated_inv = inv2
+    for item1 in inv1:
+        for item2 in inv2:
+            if item1.name == item2.name:
+                aggrivated_inv.append(Item(item1.name, item1.count + item2.count))
+                break
+    return aggrivated_inv

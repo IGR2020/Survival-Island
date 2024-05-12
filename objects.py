@@ -7,10 +7,13 @@ class Item:
     def __init__(self, name, count):
         self.name = name
         self.count = count
+        self.image_width = assets[self.name].get_width()
 
     def display(self, window, pos):
-        window.blit(assets[self.name], pos)
-        blit_text(window, self.count, pos, size=20)
+        x, y = pos
+        window.blit(assets[self.name], (x, y))
+        blit_text(window, self.name, (x + self.image_width + 5, y), size=15)
+        blit_text(window, self.count, pos, size=15)
 
 class Object(pg.Rect):
     def __init__(self, x, y, width, height, name):
@@ -65,4 +68,9 @@ class Structure(Object):
         if self.isBreaking:
             self.animateBreakng()
         super().display(window, x_offset, y_offset)
+
+class Gateway(Structure):
+    def __init__(self, x, y, name, value=None, health=3, land_link=None):
+        super().__init__(x, y, name, value, health)
+        self.land_link = land_link
 

@@ -3,5 +3,10 @@ Version Alpha 1
     + terrain generation
     + player movement
     + image land extraction
+    + player movement restricted to land
     + spawn point setting
     + tree spawning
+    + inventory display
+    + tree breaking animations
+    
+
