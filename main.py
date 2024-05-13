@@ -4,7 +4,7 @@ from land import get_land_from_image
 
 WIDTH, HEIGHT = 900, 500
 window = pg.display.set_mode((WIDTH, HEIGHT), pg.RESIZABLE)
-pg.display.set_caption("You Probably Wont Survive")
+pg.display.set_caption("You Probably Won't Survive")
 
 run = True
 clock = pg.time.Clock()
@@ -14,7 +14,7 @@ x_offset, y_offset = 0, 0
 
 player = Player(100, 100, "Player1.png")
 current_land = 0
-land, player.topleft, structures = get_land_from_image("assets/land presets/Island1.png", True)
+land, player.topleft, structures = get_land_from_image("assets/land presets/Island3.png", True)
 
 def display():
 

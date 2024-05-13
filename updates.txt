@@ -8,5 +8,6 @@ Version Alpha 1
     + tree spawning
     + inventory display
     + tree breaking animations
+    + grass generation for image extraction
     
 

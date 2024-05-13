@@ -20,7 +20,8 @@ def get_land_from_image(image_path, water_land_check=True) -> tuple[list, tuple,
     """Scans a image and creates a land aproximate and also returns a spawn point if lime green is present.\n
     Sand recomended R.G.B is 239r, 228g, 176b.\n
     Water recomended R.G.B is 0r, 162g, 232b.\n
-    Spawn point recomended R.G.B is 181r, 230g, 29b"""
+    Spawn point recomended R.G.B is 181r, 230g, 29b.\n
+    Grass recomended R.G.B is 34r, 177g, 76b."""
     land = []
     structures = []
     spawn_point = (0, 0)
@@ -29,12 +30,18 @@ def get_land_from_image(image_path, water_land_check=True) -> tuple[list, tuple,
     width, height = image.size
     data = image.load()
     sea_noise = perlin_noise.PerlinNoise()
+    grass_noise = perlin_noise.PerlinNoise()
     for x in range(width):
         for y in range(height):
             if data[x, y] == (239, 228, 176, 255):
-               if randint(0, 1) == 0: land.append(Block(x*blockSize, y*blockSize, blockSize, "Sand.png"))
-               else: land.append(Block(x*blockSize, y*blockSize, blockSize, "Flat Sand.png"))
-               if randint(0, 40) == 0: structures.append(Structure(x*blockSize, y*blockSize, choice(("Palm Tree1.png", "Palm Tree2.png", "Palm Tree3.png")), Item("Wood.png", randint(1, 6))))
+                if randint(0, 1) == 0: land.append(Block(x*blockSize, y*blockSize, blockSize, "Sand.png"))
+                else: land.append(Block(x*blockSize, y*blockSize, blockSize, "Flat Sand.png"))
+                if randint(0, 40) == 0: structures.append(Structure(x*blockSize - treeSize/3, y*blockSize - treeSize/3, choice(("Palm Tree1.png", "Palm Tree2.png", "Palm Tree3.png")), Item("Wood.png", randint(1, 6))))
+            elif data[x, y] == (34, 177, 76, 255):
+                land.append(get_grass_type_by_noise(x, y, grass_noise))
+                structure_added = get_grass_tree_by_noise(x, y, grass_noise)
+                if structure_added is not None:
+                    structures.append(structure_added)
             elif data[x, y] == (181, 230, 29, 255):
                 land.append(Block(x*blockSize, y*blockSize, blockSize, "Spawn Point.png"))
                 spawn_point = (x*blockSize, y*blockSize)
@@ -63,9 +70,34 @@ def get_land_from_image(image_path, water_land_check=True) -> tuple[list, tuple,
     return land, spawn_point, structures
 
 def get_water_type_by_noise(x, y, sea_noise):
-    if abs(sea_noise((x*landChaos, y*landChaos))) > 0.2:
+    if abs(sea_noise((x*seaChaos, y*seaChaos))) > 0.2:
         return (Block(x*blockSize, y*blockSize, blockSize, "Calm Deep Water.png"))
-    elif abs(sea_noise((x*landChaos, y*landChaos))) > 0.1:
+    elif abs(sea_noise((x*seaChaos, y*seaChaos))) > 0.1:
         return (Block(x*blockSize, y*blockSize, blockSize, "Calm Moderate Water.png"))
     else:
         return (Block(x*blockSize, y*blockSize, blockSize, "Calm Water.png"))
+    
+
+def get_grass_type_by_noise(x, y, grass_noise):
+    if abs(grass_noise((x*grassChaos, y*grassChaos))) > 0.4:
+        return (Block(x*blockSize, y*blockSize, blockSize, "Flat Grass.png"))
+    elif abs(grass_noise((x*grassChaos, y*grassChaos))) > 0.3:
+        return (Block(x*blockSize, y*blockSize, blockSize, "Grass.png"))
+    elif abs(grass_noise((x*grassChaos, y*grassChaos))) > 0.2:
+        return (Block(x*blockSize, y*blockSize, blockSize, "Short Grass.png"))
+    elif abs(grass_noise((x*grassChaos, y*grassChaos))) > 0.1:
+        return (Block(x*blockSize, y*blockSize, blockSize, "Lawn Grass.png"))
+    else:
+        return (Block(x*blockSize, y*blockSize, blockSize, "Flat Lawn Grass.png"))
+    
+def get_grass_tree_by_noise(x, y, grass_noise):
+    if abs(grass_noise((x*grassChaos, y*grassChaos))) > 0.4:
+        if randint(0, 2) == 0: return (Structure(x*blockSize - treeSize/3, y*blockSize - treeSize/4, "Tree1.png", Item("Wood.png", randint(2, 9))))
+    elif abs(grass_noise((x*grassChaos, y*grassChaos))) > 0.3:
+        if randint(0, 7) == 0: return Structure(x*blockSize - treeSize/3, y*blockSize - treeSize/4, "Tree1.png", Item("Wood.png", randint(2, 9)))
+    elif abs(grass_noise((x*grassChaos, y*grassChaos))) > 0.2:
+        if randint(0, 10) == 0: return Structure(x*blockSize - treeSize/3, y*blockSize - treeSize/4, "Tree1.png", Item("Wood.png", randint(2, 9)))
+    elif abs(grass_noise((x*grassChaos, y*grassChaos))) > 0.1:
+        if randint(0, 15) == 0: return Structure(x*blockSize - treeSize/3, y*blockSize - treeSize/4, "Tree1.png", Item("Wood.png", randint(2, 9)))
+    else:
+        if randint(0, 21) == 0: return Structure(x*blockSize - treeSize/3, y*blockSize - treeSize/4, "Tree1.png", Item("Wood.png", randint(2, 9)))
