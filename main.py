@@ -2,6 +2,7 @@ import pygame as pg
 from player import Player, agrivate_inventory
 from land import get_world_from_directory
 from assets import *
+from time import time
 
 WIDTH, HEIGHT = 900, 500
 window = pg.display.set_mode((WIDTH, HEIGHT), pg.RESIZABLE)
@@ -10,6 +11,9 @@ pg.display.set_caption("You Probably Won't Survive")
 run = True
 clock = pg.time.Clock()
 FPS = 60
+
+portal_travel_cooldown = 0.5
+portal_time = time()
 
 x_offset, y_offset = 0, 0
 
@@ -26,7 +30,7 @@ def load_current_word():
     gateway_link = word[current_land]["gateway link"]
     return land, structures, spawn, gateway_point, gateway_link
 
-land, structures, spawn, gateway_point = load_current_word()
+land, structures, spawn, gateway_point, gateway_link = load_current_word()
 player.topleft = spawn
 
 def display():
@@ -97,10 +101,11 @@ while run:
 
     player.script(land, delta_time)
 
-    if player.collidepoint(gateway_point):
+    if player.collidepoint(gateway_point) and time() - portal_time > portal_travel_cooldown:
         current_land = gateway_link
         land, structures, spawn, gateway_point, gateway_link = load_current_word()
         player.topleft = gateway_point
+        portal_time = time()
 
     x_offset, y_offset = player.x-WIDTH/2, player.y-HEIGHT/2
 

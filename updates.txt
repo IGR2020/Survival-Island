@@ -9,4 +9,5 @@ Version Alpha 1
     + inventory display
     + tree breaking animations
     + grass generation for image extraction
+    + portal travel
     
