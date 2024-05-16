@@ -40,21 +40,23 @@ class Player(pg.Rect):
      def stopMovingV(self):
          self.y_vel = 0
 
-     def script(self, land):
-        self.y += self.y_vel
-        for block in land:
-            if block.name in ("Calm Water.png", "Calm Moderate Water.png", "Calm Deep Water.png", "Water.png") and self.colliderect(block):
-                if self.y_vel < 0:
-                    self.top = block.bottom
-                else:
-                    self.bottom = block.top
-        self.x += self.x_vel
-        for block in land:
-            if block.name in ("Calm Water.png", "Calm Moderate Water.png", "Calm Deep Water.png", "Water.png") and self.colliderect(block):
-                if self.x_vel < 0:
-                    self.left = block.right
-                else:
-                    self.right = block.left
+     def script(self, land, dt):
+        self.y += self.y_vel * dt
+        for collum in land:
+            for block in collum:
+                if block.name in ("Calm Water.png", "Calm Moderate Water.png", "Calm Deep Water.png", "Water.png") and self.colliderect(block):
+                    if self.y_vel < 0:
+                        self.top = block.bottom
+                    else:
+                        self.bottom = block.top
+        self.x += self.x_vel * dt
+        for collum in land:
+            for block in collum:
+                if block.name in ("Calm Water.png", "Calm Moderate Water.png", "Calm Deep Water.png", "Water.png") and self.colliderect(block):
+                    if self.x_vel < 0:
+                        self.left = block.right
+                    else:
+                        self.right = block.left
         if not self.isMovingH:
             self.stopMovingH()
         else:

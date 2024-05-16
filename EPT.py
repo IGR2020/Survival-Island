@@ -1,6 +1,7 @@
 import pygame
 from os import listdir
 from os.path import join, isfile
+from threading import Thread
 
 pygame.font.init()
 
@@ -52,6 +53,14 @@ def load_assets(path, size: int = None, scale: float = None):
             )
     return sprites
 
-
-def remove_prefix(str: str, prefix: str):
-    return str[len(prefix) :] if str.startswith(prefix) else str
+def convert_to_thread(func, fps):
+    def wrapper():
+        clock = pygame.time.Clock()
+        while True:
+            clock.tick(fps)
+            try:
+                func()
+            except:
+                return
+    wrapper_thread = Thread(target=wrapper)
+    return wrapper_thread

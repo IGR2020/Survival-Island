@@ -1,6 +1,7 @@
 import pygame as pg
 from player import Player, agrivate_inventory
-from land import get_land_from_image
+from land import get_world_from_directory
+from assets import *
 
 WIDTH, HEIGHT = 900, 500
 window = pg.display.set_mode((WIDTH, HEIGHT), pg.RESIZABLE)
@@ -14,14 +15,29 @@ x_offset, y_offset = 0, 0
 
 player = Player(100, 100, "Player1.png")
 current_land = 0
-land, player.topleft, structures = get_land_from_image("assets/land presets/Island3.png", True)
+
+word = get_world_from_directory("assets/land presets", True, True)
+
+def load_current_word():
+    land = word[current_land]["land"]
+    structures = word[current_land]["structures"]
+    spawn = word[current_land]["spawn"]
+    gateway_point = word[current_land]["gateway point"]
+    gateway_link = word[current_land]["gateway link"]
+    return land, structures, spawn, gateway_point, gateway_link
+
+land, structures, spawn, gateway_point = load_current_word()
+player.topleft = spawn
 
 def display():
 
     window.fill((29, 117, 139))
-
-    for block in land:
-        block.display(window, x_offset, y_offset)
+    for x in range(round((WIDTH+x_offset)//blockSize)+1):
+        for y in range(round((HEIGHT+y_offset)//blockSize)+1):
+            try:
+                land[x][y].display(window, x_offset, y_offset)
+            except IndexError:
+                pass
 
     for structure in structures:
         structure.display(window, x_offset, y_offset)
@@ -37,12 +53,15 @@ def display():
 
 while run:
 
-    clock.tick()
+    delta_time = clock.tick() / 16
 
     for event in pg.event.get():
 
         if event.type == pg.QUIT:
             run = False
+
+        if event.type == pg.VIDEORESIZE:
+            WIDTH, HEIGHT = event.dict["size"]
 
         if event.type == pg.MOUSEBUTTONDOWN:
             offset_mouse_x, offset_mouse_y = pg.mouse.get_pos()
@@ -76,7 +95,12 @@ while run:
         player.moveDown()
         player.isMovingV = True
 
-    player.script(land)
+    player.script(land, delta_time)
+
+    if player.collidepoint(gateway_point):
+        current_land = gateway_link
+        land, structures, spawn, gateway_point, gateway_link = load_current_word()
+        player.topleft = gateway_point
 
     x_offset, y_offset = player.x-WIDTH/2, player.y-HEIGHT/2
 
