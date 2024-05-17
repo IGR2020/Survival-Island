@@ -14,7 +14,6 @@ FPS = 60
 
 portal_travel_cooldown = 0.5
 portal_time = time()
-
 x_offset, y_offset = 0, 0
 
 player = Player(100, 100, "Player1.png")
@@ -28,10 +27,12 @@ def load_current_word():
     spawn = word[current_land]["spawn"]
     gateway_point = word[current_land]["gateway point"]
     gateway_link = word[current_land]["gateway link"]
-    return land, structures, spawn, gateway_point, gateway_link
+    spawners = word[current_land]["spawners"]
+    return land, structures, spawn, gateway_point, gateway_link, spawners
 
-land, structures, spawn, gateway_point, gateway_link = load_current_word()
+land, structures, spawn, gateway_point, gateway_link, spawners = load_current_word()
 player.topleft = spawn
+monsters = []
 
 def display():
 
@@ -45,6 +46,9 @@ def display():
 
     for structure in structures:
         structure.display(window, x_offset, y_offset)
+
+    for monster in monsters:
+        monster.display(window, x_offset, y_offset)
 
     player.display(window, x_offset, y_offset)
 
@@ -103,9 +107,19 @@ while run:
 
     if player.collidepoint(gateway_point) and time() - portal_time > portal_travel_cooldown:
         current_land = gateway_link
-        land, structures, spawn, gateway_point, gateway_link = load_current_word()
+        land, structures, spawn, gateway_point, gateway_link, spawners = load_current_word()
         player.topleft = gateway_point
         portal_time = time()
+        monsters = []
+
+    for spawner_coords in spawners:
+        x, y = spawner_coords
+        monster = land[x][y].script()
+        if monster is not None:
+            monsters.append(monster)
+
+    for monster in monsters:
+        monster.script({"player pos": player.topleft, "land": land, "delta time": delta_time})
 
     x_offset, y_offset = player.x-WIDTH/2, player.y-HEIGHT/2
 

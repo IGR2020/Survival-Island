@@ -10,4 +10,5 @@ Version Alpha 1
     + tree breaking animations
     + grass generation for image extraction
     + portal travel
+    + zombie spawning
     

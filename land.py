@@ -1,6 +1,6 @@
 from assets import *
 import perlin_noise
-from objects import Block, Structure, Item, Gateway
+from objects import Block, Structure, Item, Gateway, Spawner, Monster
 from PIL import Image
 from random import randint, choice
 from os import listdir
@@ -24,9 +24,11 @@ def get_land_from_image(image_path, water_land_check=True, create_gateway = Fals
     Water recomended R.G.B is 0r, 162g, 232b.\n
     Spawn point recomended R.G.B is 181r, 230g, 29b.\n
     Grass recomended R.G.B is 34r, 177g, 76b.\n
-    Gateway recomended R.G.B is 163r, 73g, 164b."""
+    Gateway recomended R.G.B is 163r, 73g, 164b.\n
+    Monster Spawner recomended R.G.B is 127r, 127g, 127b."""
     land = []
     structures = []
+    spawners = []
     spawn_point = (0, 0)
     gateway_point = (0, 0)
     image = Image.open(image_path)
@@ -47,10 +49,13 @@ def get_land_from_image(image_path, water_land_check=True, create_gateway = Fals
                 structure_added = get_grass_tree_by_noise(x, y, grass_noise)
                 if structure_added is not None:
                     structures.append(structure_added)
+            elif data[x, y] == (127, 127, 127, 255):
+                spawners.append((x, y))
+                land[-1].append(Spawner(x*blockSize, y*blockSize, blockSize, "Monster Spawner.png", 3, Monster, "Zombie1.png"))
             elif data[x, y] == (163, 73, 164, 255):
                 gateway_point = (x*blockSize - treeSize/3, y*blockSize - treeSize/3)
                 land[-1].append(Block(x*blockSize, y*blockSize, blockSize, "Gateway Point.png"))
-                structures.append(Gateway(x*blockSize - treeSize/3, y*blockSize - treeSize/3, "Gateway.png", health=64, land_link=gateway_link))
+                structures.append(Gateway(x*blockSize, y*blockSize  - treeSize/3, "Gateway.png", health=64, land_link=gateway_link))
             elif data[x, y] == (181, 230, 29, 255):
                 land[-1].append(Block(x*blockSize, y*blockSize, blockSize, "Spawn Point.png"))
                 spawn_point = (x*blockSize, y*blockSize)
@@ -82,7 +87,7 @@ def get_land_from_image(image_path, water_land_check=True, create_gateway = Fals
                     land[-1].append(Block(x*blockSize, y*blockSize, blockSize, "Calm Deep Water.png"))
                     continue
                 land[-1].append(get_water_type_by_noise(x, y, sea_noise))
-    return land, spawn_point, structures, gateway_point
+    return land, spawn_point, structures, gateway_point, spawners
 
 def get_water_type_by_noise(x, y, sea_noise):
     if abs(sea_noise((x*seaChaos, y*seaChaos))) > 0.2:
@@ -122,6 +127,6 @@ def get_world_from_directory(dir_path, water_land_check=True, create_land_links=
     world = []
     paths = listdir(dir_path)
     for i, path in enumerate(paths):
-        land, spawn, stuctures, gateway_point = get_land_from_image(join(dir_path, path), water_land_check, create_land_links, i-1)
-        world.append({"land": land, "spawn": spawn, "structures": stuctures, "gateway point": gateway_point, "gateway link": i-1})
+        land, spawn, stuctures, gateway_point, spawners = get_land_from_image(join(dir_path, path), water_land_check, create_land_links, i-1)
+        world.append({"land": land, "spawn": spawn, "structures": stuctures, "gateway point": gateway_point, "gateway link": i-1, "spawners": spawners})
     return world
