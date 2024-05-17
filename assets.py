@@ -1,4 +1,9 @@
 from EPT import load_assets
+import pygame as pg
+from pygame import Surface
+
+pg.display.init()
+pg.display.set_mode((900, 500))
 
 blockSize = 16
 treeSize = 18

@@ -99,19 +99,23 @@ class Spawner(Block):
 
 
 class Monster(pg.Rect):
-    def __init__(self, x, y, width, height, name, speed=0.5):
+    def __init__(self, x, y, width, height, name, health=4, speed=0.5):
         super().__init__(x, y, width, height)
         self.name = name
         self.x_vel = 0
         self.y_vel = 0
         self.speed = speed
-        self.maxSpeed = 2
+        self.maxSpeed = 2.5
+        self.isHit = False
+        self.timeSinceLastHit = time()
+        self.health = health
+        self.delay = 0.3 # time to show blood overlay
 
     def script(self, info_dict, *args):
         player_x, player_y = info_dict["player pos"]
         dt = info_dict["delta time"]
         land = info_dict["land"]
-        if abs(player_x - self.x) < 48 and abs(player_y - self.y) < 48:
+        if abs(player_x - self.x) < 48 and abs(player_y - self.y) < 48 and not self.isHit:
             self.x_vel, self.y_vel = 0, 0
         if player_x > self.x:
             self.x_vel += self.speed
@@ -121,10 +125,16 @@ class Monster(pg.Rect):
             self.x_vel -= self.speed
         if player_y < self.y:
             self.y_vel -= self.speed
-        self.x_vel = max(self.x_vel, -self.maxSpeed)
-        self.x_vel = min(self.x_vel, self.maxSpeed)
-        self.y_vel = min(self.y_vel, self.maxSpeed)
-        self.y_vel = max(self.y_vel, -self.maxSpeed)
+        if not self.isHit:
+            self.x_vel = max(self.x_vel, -self.maxSpeed)
+            self.x_vel = min(self.x_vel, self.maxSpeed)
+            self.y_vel = min(self.y_vel, self.maxSpeed)
+            self.y_vel = max(self.y_vel, -self.maxSpeed)
+        else:
+            self.x_vel = max(self.x_vel, -self.maxSpeed * 5)
+            self.x_vel = min(self.x_vel, self.maxSpeed * 5)
+            self.y_vel = min(self.y_vel, self.maxSpeed * 5)
+            self.y_vel = max(self.y_vel, -self.maxSpeed * 5)
         self.y += self.y_vel * dt
         by, bx = self.y // blockSize, self.centerx // blockSize
         if land[bx][by].name in (
@@ -162,3 +172,17 @@ class Monster(pg.Rect):
 
     def display(self, window, x_offset, y_offset):
         window.blit(assets[self.name], (self.x - x_offset, self.y - y_offset))
+        if self.isHit:
+            window.blit(assets["Blood Overlay.png"], (self.x - x_offset, self.y - y_offset))
+        if time() - self.timeSinceLastHit > self.delay:
+            self.isHit = False
+
+    def hit(self) -> bool:
+        self.health -= 1
+        self.isHit = True
+        self.x_vel = -self.x_vel * 20
+        self.y_vel = -self.y_vel * 20
+        self.timeSinceLastHit = time()
+        if self.health < 1:
+            return True
+        return False

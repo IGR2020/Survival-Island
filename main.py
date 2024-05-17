@@ -81,6 +81,12 @@ while run:
                     if gain is not None:
                         player.inventory = agrivate_inventory(player.inventory, [gain])
                         structures.remove(structure)
+                    break
+            else:
+                for monster in monsters:
+                    if monster.collidepoint((offset_mouse_x, offset_mouse_y)):
+                        if monster.hit():
+                            monsters.remove(monster)
 
         if event.type == pg.KEYDOWN:
             if event.key == pg.K_F3:

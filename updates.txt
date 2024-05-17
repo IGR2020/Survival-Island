@@ -11,4 +11,5 @@ Version Alpha 1
     + grass generation for image extraction
     + portal travel
     + zombie spawning
+    + tile refrence collision
     
