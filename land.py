@@ -128,5 +128,5 @@ def get_world_from_directory(dir_path, water_land_check=True, create_land_links=
     paths = listdir(dir_path)
     for i, path in enumerate(paths):
         land, spawn, stuctures, gateway_point, spawners = get_land_from_image(join(dir_path, path), water_land_check, create_land_links, i-1)
-        world.append({"land": land, "spawn": spawn, "structures": stuctures, "gateway point": gateway_point, "gateway link": i-1, "spawners": spawners})
+        world.append({"land": land, "spawn": spawn, "structures": stuctures, "gateway point": gateway_point, "gateway link": i-1, "spawners": spawners, "monsters": []})
     return world

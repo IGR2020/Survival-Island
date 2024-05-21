@@ -14,7 +14,7 @@ assets = {}
 assets.update(load_assets("assets/objects", None, 2))
 assets.update(load_assets(("assets/players"), (player_width, player_height)))
 assets.update(load_assets("assets/tiles", (blockSize, blockSize)))
-assets.update(load_assets("assets/items", (32, 32)))
+assets.update(load_assets("assets/items", None, 2))
 
 landChaos = 0.02
 seaChaos = 0.02

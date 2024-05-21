@@ -90,12 +90,12 @@ class Player(pg.Rect):
 
 
 def agrivate_inventory(inv1, inv2):
-    aggrivated_inv = []
-    if len(inv1) == 0:
-        aggrivated_inv = inv2
-    for item1 in inv1:
-        for item2 in inv2:
+    for i2, item2 in enumerate(inv2):
+        for i1, item1 in enumerate(inv1):
             if item1.name == item2.name:
-                aggrivated_inv.append(Item(item1.name, item1.count + item2.count))
+                inv1[i1].count += item2.count
                 break
-    return aggrivated_inv
+        else:
+            inv1.append(item2)
+
+    return inv1

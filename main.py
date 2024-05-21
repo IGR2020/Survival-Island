@@ -3,6 +3,9 @@ from player import Player, agrivate_inventory
 from land import get_world_from_directory
 from assets import *
 from time import time
+from objects import Sword
+from math import ceil
+from EPT import blit_text
 
 WIDTH, HEIGHT = 900, 500
 window = pg.display.set_mode((WIDTH, HEIGHT), pg.RESIZABLE)
@@ -16,33 +19,52 @@ portal_travel_cooldown = 0.5
 portal_time = time()
 x_offset, y_offset = 0, 0
 
+base_damage = 1
 player = Player(100, 100, "Player1.png")
+player.inventory.append(Sword(name="Long Sword.png"))
 current_land = 0
+
+correction_angle = 45
 
 word = get_world_from_directory("assets/land presets", True, True)
 
-def load_current_word():
+
+def load_current_world():
     land = word[current_land]["land"]
     structures = word[current_land]["structures"]
     spawn = word[current_land]["spawn"]
-    gateway_point = word[current_land]["gateway point"]
-    gateway_link = word[current_land]["gateway link"]
     spawners = word[current_land]["spawners"]
-    return land, structures, spawn, gateway_point, gateway_link, spawners
+    monsters = word[current_land]["monsters"]
+    return land, structures, spawn, spawners, monsters
 
-land, structures, spawn, gateway_point, gateway_link, spawners = load_current_word()
+
+def save_current_world():
+    word[current_land]["land"] = land
+    word[current_land]["structures"] = structures
+    word[current_land]["spawn"] = spawn
+    word[current_land]["spawners"] = spawners
+    word[current_land]["monsters"] = monsters
+
+
+land, structures, spawn, spawners, monsters = load_current_world()
 player.topleft = spawn
-monsters = []
+
+
+def mapBlocks():
+    [
+        land[x][y].display(window, x_offset, y_offset)
+        for x in range(min(ceil((WIDTH + x_offset) // blockSize), len(land)-1))
+        for y in range(min(ceil((HEIGHT + y_offset) // blockSize), len(land[0])-1))
+    ]
+
+
+showDebug = False
+
 
 def display():
 
     window.fill((29, 117, 139))
-    for x in range(round((WIDTH+x_offset)//blockSize)+1):
-        for y in range(round((HEIGHT+y_offset)//blockSize)+1):
-            try:
-                land[x][y].display(window, x_offset, y_offset)
-            except IndexError:
-                pass
+    mapBlocks()
 
     for structure in structures:
         structure.display(window, x_offset, y_offset)
@@ -50,14 +72,20 @@ def display():
     for monster in monsters:
         monster.display(window, x_offset, y_offset)
 
+    player.inventory[0].display_as_object(window, x_offset, y_offset, player)
+
     player.display(window, x_offset, y_offset)
 
+    y = 0
     for item in player.inventory:
-        y = 0
         item.display(window, (0, y))
-        y += 20
+        y += 32
+
+    if showDebug:
+        blit_text(window, round(clock.get_fps()), (0, 0))
 
     pg.display.update()
+
 
 while run:
 
@@ -85,11 +113,13 @@ while run:
             else:
                 for monster in monsters:
                     if monster.collidepoint((offset_mouse_x, offset_mouse_y)):
-                        if monster.hit():
+                        if monster.hit(base_damage + player.inventory[0].damage):
                             monsters.remove(monster)
+                        break
 
         if event.type == pg.KEYDOWN:
             if event.key == pg.K_F3:
+                showDebug = not showDebug
                 print(round(clock.get_fps()))
                 print([i.name for i in player.inventory])
                 print([i.count for i in player.inventory])
@@ -111,12 +141,20 @@ while run:
 
     player.script(land, delta_time)
 
-    if player.collidepoint(gateway_point) and time() - portal_time > portal_travel_cooldown:
-        current_land = gateway_link
-        land, structures, spawn, gateway_point, gateway_link, spawners = load_current_word()
-        player.topleft = gateway_point
-        portal_time = time()
-        monsters = []
+    for structure in structures:
+        if (
+            player.colliderect(structure)
+            and time() - portal_time > portal_travel_cooldown
+            and structure.name == "Gateway.png"
+        ):
+            save_current_world()
+            current_land = structure.land_link
+            land, structures, spawn, spawners, monsters = load_current_world()
+            for structure in structures:
+                if structure.name == "Gateway.png":
+                    player.topleft = structure.topleft
+            portal_time = time()
+            break
 
     for spawner_coords in spawners:
         x, y = spawner_coords
@@ -125,9 +163,16 @@ while run:
             monsters.append(monster)
 
     for monster in monsters:
-        monster.script({"player pos": player.topleft, "land": land, "delta time": delta_time})
+        monster.script(
+            {
+                "player pos": player.topleft,
+                "land": land,
+                "delta time": delta_time,
+                "window size": (WIDTH, HEIGHT),
+            }
+        )
 
-    x_offset, y_offset = player.x-WIDTH/2, player.y-HEIGHT/2
+    x_offset, y_offset = player.x - WIDTH / 2, player.y - HEIGHT / 2
 
     display()
 

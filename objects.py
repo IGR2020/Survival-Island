@@ -2,13 +2,15 @@ from assets import *
 import pygame as pg
 from time import time
 from EPT import blit_text
+from math import degrees, atan2
 
 
 class Item:
-    def __init__(self, name, count):
+    def __init__(self, name, count, item_type="Item"):
         self.name = name
         self.count = count
         self.image_width = assets[self.name].get_width()
+        self.type = item_type
 
     def display(self, window, pos):
         x, y = pos
@@ -115,6 +117,9 @@ class Monster(pg.Rect):
         player_x, player_y = info_dict["player pos"]
         dt = info_dict["delta time"]
         land = info_dict["land"]
+        window_width, window_height = info_dict["window size"]
+        if abs(player_x - self.x) > window_width*1.4 and abs(player_y - self.y) > window_height*1.4 and not self.isHit:
+            return
         if abs(player_x - self.x) < 48 and abs(player_y - self.y) < 48 and not self.isHit:
             self.x_vel, self.y_vel = 0, 0
         if player_x > self.x:
@@ -177,8 +182,8 @@ class Monster(pg.Rect):
         if time() - self.timeSinceLastHit > self.delay:
             self.isHit = False
 
-    def hit(self) -> bool:
-        self.health -= 1
+    def hit(self, damage) -> bool:
+        self.health -= damage
         self.isHit = True
         self.x_vel = -self.x_vel * 20
         self.y_vel = -self.y_vel * 20
@@ -186,3 +191,26 @@ class Monster(pg.Rect):
         if self.health < 1:
             return True
         return False
+    
+class Sword(Item):
+
+    def  __init__(self, name="Black Sword.png", count=1, item_type="Tool", damage=1):
+        self.correction_angle = 45
+        self.damage = damage
+        super().__init__(name, count, item_type)
+
+    def display(self, window, pos):
+        super().display(window, pos)
+
+    def display_as_object(self, window, x_offset, y_offset, player):
+        offset_mouse_x, offset_mouse_y = pg.mouse.get_pos()
+        offset_mouse_x += x_offset
+        offset_mouse_y += y_offset
+        dx, dy = offset_mouse_x - player.centerx, offset_mouse_y - player.centery
+        angle = degrees(atan2(-dy, dx)) - self.correction_angle
+
+        rotated_image = pg.transform.rotate(assets[self.name], angle)
+        rotated_image_rect = rotated_image.get_rect(center=player.center)
+
+        window.blit(rotated_image, (rotated_image_rect.x - x_offset, rotated_image_rect.y - y_offset))
+        return rotated_image_rect

@@ -64,3 +64,4 @@ def convert_to_thread(func, fps):
                 return
     wrapper_thread = Thread(target=wrapper)
     return wrapper_thread
+
