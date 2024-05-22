@@ -1,6 +1,6 @@
 import pygame
 from os import listdir
-from os.path import join, isfile
+from os.path import join, isfile, isdir
 from threading import Thread
 
 pygame.font.init()
@@ -36,10 +36,13 @@ class Button(pygame.Rect):
         win.blit(self.image, self)
 
 
-def load_assets(path, size: int = None, scale: float = None):
+def load_assets(path, size: int = None, scale: float = None, getSubDirsAsList=False):
     sprites = {}
     for file in listdir(path):
-        if not isfile(join(path, file)):
+        if getSubDirsAsList and isdir(join(path, file)):
+            sprites[file] = load_assets_list(join(path, file), size, scale)
+            continue
+        elif not isfile(join(path, file)):
             continue
         if size is None and scale is None:
             sprites[file] = pygame.image.load(join(path, file))
@@ -52,6 +55,24 @@ def load_assets(path, size: int = None, scale: float = None):
                 pygame.image.load(join(path, file)), size
             )
     return sprites
+
+def load_assets_list(path, size: int = None, scale: float = None):
+    sprites = []
+    for file in listdir(path):
+        if not isfile(join(path, file)):
+            continue
+        if size is None and scale is None:
+            sprites.append(pygame.image.load(join(path, file)))
+        elif scale is not None:
+            sprites.append(pygame.transform.scale_by(
+                pygame.image.load(join(path, file)), scale
+            ))
+        else:
+            sprites.append(pygame.transform.scale(
+                pygame.image.load(join(path, file)), size
+            ))
+    return sprites
+
 
 def convert_to_thread(func, fps):
     def wrapper():

@@ -1,6 +1,6 @@
 from assets import *
 import perlin_noise
-from objects import Block, Structure, Item, Gateway, Spawner, Monster
+from objects import *
 from PIL import Image
 from random import randint, choice
 from os import listdir
@@ -51,7 +51,8 @@ def get_land_from_image(image_path, water_land_check=True, create_gateway = Fals
                     structures.append(structure_added)
             elif data[x, y] == (127, 127, 127, 255):
                 spawners.append((x, y))
-                land[-1].append(Spawner(x*blockSize, y*blockSize, blockSize, "Monster Spawner.png", 3, Monster, "Zombie1.png"))
+                if randint(0, 5) == 0: land[-1].append(Spawner(x*blockSize, y*blockSize, blockSize, "Monster Spawner.png", 3, Monster, "Zombie1.png"))
+                else: land[-1].append(Spawner(x*blockSize, y*blockSize, blockSize, "Monster Spawner.png", 3, Robot, "Zombie1.png"))
             elif data[x, y] == (163, 73, 164, 255):
                 gateway_point = (x*blockSize - treeSize/3, y*blockSize - treeSize/3)
                 land[-1].append(Block(x*blockSize, y*blockSize, blockSize, "Gateway Point.png"))

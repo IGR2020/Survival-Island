@@ -101,7 +101,7 @@ class Spawner(Block):
 
 
 class Monster(pg.Rect):
-    def __init__(self, x, y, width, height, name, health=4, speed=0.5):
+    def __init__(self, x, y, width, height, name, health=4, speed=0.25):
         super().__init__(x, y, width, height)
         self.name = name
         self.x_vel = 0
@@ -112,6 +112,8 @@ class Monster(pg.Rect):
         self.timeSinceLastHit = time()
         self.health = health
         self.delay = 0.3 # time to show blood overlay
+        self.animation_count = 0
+        self.animate_speed = 3
 
     def script(self, info_dict, *args):
         player_x, player_y = info_dict["player pos"]
@@ -214,3 +216,23 @@ class Sword(Item):
 
         window.blit(rotated_image, (rotated_image_rect.x - x_offset, rotated_image_rect.y - y_offset))
         return rotated_image_rect
+    
+class Robot(Monster):
+    def __init__(self, x, y, width, height, name=None, health=8, speed=1.5):
+        super().__init__(x, y, width, height, name, health, speed)
+        self.state = None
+        self.maxSpeed = 8
+        self.animate_speed = 16
+    def display(self, window, x_offset, y_offset):
+        if self.x_vel > 0:
+            self.state = "Right"
+        if self.x_vel < 0:
+            self.state = "Left"
+        else:
+            self.state = "Idle"
+        self.animation_count += 1
+        window.blit(assets[self.state][(self.animation_count // self.animate_speed) % len(assets[self.state])], (self.x - x_offset, self.y - y_offset))
+        if self.isHit:
+            window.blit(assets["Blood Overlay.png"], (self.x - x_offset, self.y - y_offset))
+        if time() - self.timeSinceLastHit > self.delay:
+            self.isHit = False
