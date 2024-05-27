@@ -3,6 +3,7 @@ import pygame as pg
 from time import time
 from EPT import blit_text
 from math import degrees, atan2
+import json
 
 
 class Item:
@@ -205,6 +206,7 @@ class Sword(Item):
         super().display(window, pos)
 
     def display_as_object(self, window, x_offset, y_offset, player):
+
         offset_mouse_x, offset_mouse_y = pg.mouse.get_pos()
         offset_mouse_x += x_offset
         offset_mouse_y += y_offset
@@ -218,11 +220,17 @@ class Sword(Item):
         return rotated_image_rect
     
 class Robot(Monster):
-    def __init__(self, x, y, width, height, name=None, health=8, speed=1.5):
-        super().__init__(x, y, width, height, name, health, speed)
+    def __init__(self, x, y, width, height, name=None):
+        super().__init__(x, y, width, height, name, None, None)
         self.state = None
-        self.maxSpeed = 8
-        self.animate_speed = 16
+        with open("object data/enemy.json") as file:
+            data = json.load(file)["Robot"]
+            self.maxSpeed = data["Max Speed"]
+            self.speed = data["Speed"]
+            self.animate_speed = data["Animate Speed"]
+            self.health = data["Health"]
+            file.close()
+
     def display(self, window, x_offset, y_offset):
         if self.x_vel > 0:
             self.state = "Right"

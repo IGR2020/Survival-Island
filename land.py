@@ -88,6 +88,7 @@ def get_land_from_image(image_path, water_land_check=True, create_gateway = Fals
                     land[-1].append(Block(x*blockSize, y*blockSize, blockSize, "Calm Deep Water.png"))
                     continue
                 land[-1].append(get_water_type_by_noise(x, y, sea_noise))
+    image.close()
     return land, spawn_point, structures, gateway_point, spawners
 
 def get_water_type_by_noise(x, y, sea_noise):

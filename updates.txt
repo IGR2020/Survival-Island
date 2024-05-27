@@ -14,3 +14,4 @@ Version Alpha 1
     + tile refrence collision
     + proformance upgrades (old 67 new 69 on map 1 and old 45 new 49)
     + robot spawing
+    + json file loading

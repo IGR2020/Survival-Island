@@ -53,12 +53,13 @@ player.topleft = spawn
 def mapBlocks():
     [
         land[x][y].display(window, x_offset, y_offset)
-        for x in range(min(ceil((WIDTH + x_offset) // blockSize), len(land)-1))
-        for y in range(min(ceil((HEIGHT + y_offset) // blockSize), len(land[0])-1))
+        for x in range(min(ceil((WIDTH + x_offset) / blockSize), len(land)-1))
+        for y in range(min(ceil((HEIGHT + y_offset) / blockSize), len(land[0])-1))
     ]
 
 
 showDebug = False
+tool_rect = player.inventory[0].display_as_object(window, x_offset, y_offset, player)
 
 
 def display():
@@ -72,7 +73,7 @@ def display():
     for monster in monsters:
         monster.display(window, x_offset, y_offset)
 
-    player.inventory[0].display_as_object(window, x_offset, y_offset, player)
+    tool_rect = player.inventory[0].display_as_object(window, x_offset, y_offset, player)
 
     player.display(window, x_offset, y_offset)
 
@@ -112,7 +113,7 @@ while run:
                     break
             else:
                 for monster in monsters:
-                    if monster.collidepoint((offset_mouse_x, offset_mouse_y)):
+                    if monster.colliderect(tool_rect):
                         if monster.hit(base_damage + player.inventory[0].damage):
                             monsters.remove(monster)
                         break
@@ -171,6 +172,7 @@ while run:
                 "window size": (WIDTH, HEIGHT),
             }
         )
+
 
     x_offset, y_offset = player.x - WIDTH / 2, player.y - HEIGHT / 2
 
