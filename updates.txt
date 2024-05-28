@@ -15,3 +15,4 @@ Version Alpha 1
     + proformance upgrades (old 67 new 69 on map 1 and old 45 new 49)
     + robot spawing
     + json file loading
+    + darkness effects

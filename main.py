@@ -5,11 +5,14 @@ from assets import *
 from time import time
 from objects import Sword
 from math import ceil
-from EPT import blit_text
+from EPT import blit_text, convert_to_thread
+from pygame.image import load
+from effects import draw_darkness_filter_at_player
 
 WIDTH, HEIGHT = 900, 500
 window = pg.display.set_mode((WIDTH, HEIGHT), pg.RESIZABLE)
-pg.display.set_caption("You Probably Won't Survive")
+pg.display.set_caption("Survival Island")
+pg.display.set_icon(load("assets/Icon.png"))
 
 run = True
 clock = pg.time.Clock()
@@ -50,23 +53,30 @@ land, structures, spawn, spawners, monsters = load_current_world()
 player.topleft = spawn
 
 
-def mapBlocks():
-    [
-        land[x][y].display(window, x_offset, y_offset)
-        for x in range(min(ceil((WIDTH + x_offset) / blockSize), len(land)-1))
-        for y in range(min(ceil((HEIGHT + y_offset) / blockSize), len(land[0])-1))
-    ]
+def mapBlocks(x_offset, y_offset):
+    try:
+        [
+            land[x][y].display(window, x_offset, y_offset)
+            for x in range(min(ceil((WIDTH + x_offset) / blockSize), len(land)-1))
+            for y in range(min(ceil((HEIGHT + y_offset) / blockSize), len(land[0])-1))
+        ]
+    except IndexError:
+        pass
 
 
 showDebug = False
 tool_rect = player.inventory[0].display_as_object(window, x_offset, y_offset, player)
 
 
-def display():
+def display(internal_clock):
+    global tool_rect
+
+    x_offset, y_offset = player.x - WIDTH / 2, player.y - HEIGHT / 2
 
     window.fill((29, 117, 139))
-    mapBlocks()
 
+    mapBlocks(x_offset, y_offset)
+    
     for structure in structures:
         structure.display(window, x_offset, y_offset)
 
@@ -77,20 +87,27 @@ def display():
 
     player.display(window, x_offset, y_offset)
 
+    draw_darkness_filter_at_player(window, player, x_offset, y_offset)
+
     y = 0
     for item in player.inventory:
         item.display(window, (0, y))
         y += 32
 
     if showDebug:
-        blit_text(window, round(clock.get_fps()), (0, 0))
+        blit_text(window, round(clock.get_fps()), (0, 0), colour=(255, 255, 255))
+        blit_text(window, round(internal_clock.get_fps()), (0, 50), colour=(255, 255, 255))
 
     pg.display.update()
 
 
+display_thread = convert_to_thread(display, 60, True)
+display_thread.start()
+
+
 while run:
 
-    delta_time = clock.tick() / 16
+    delta_time = clock.tick(60) / 16
 
     for event in pg.event.get():
 
@@ -99,6 +116,7 @@ while run:
 
         if event.type == pg.VIDEORESIZE:
             WIDTH, HEIGHT = event.dict["size"]
+            assets["Filter"] = pg.surface.Surface((WIDTH, HEIGHT))
 
         if event.type == pg.MOUSEBUTTONDOWN:
             offset_mouse_x, offset_mouse_y = pg.mouse.get_pos()
@@ -118,12 +136,9 @@ while run:
                             monsters.remove(monster)
                         break
 
-        if event.type == pg.KEYDOWN:
+        if event.type == pg.KEYDOWN: 
             if event.key == pg.K_F3:
                 showDebug = not showDebug
-                print(round(clock.get_fps()))
-                print([i.name for i in player.inventory])
-                print([i.count for i in player.inventory])
 
     keys = pg.key.get_pressed()
 
@@ -172,11 +187,6 @@ while run:
                 "window size": (WIDTH, HEIGHT),
             }
         )
-
-
-    x_offset, y_offset = player.x - WIDTH / 2, player.y - HEIGHT / 2
-
-    display()
 
 pg.quit()
 quit()

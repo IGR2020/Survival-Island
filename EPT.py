@@ -56,6 +56,7 @@ def load_assets(path, size: int = None, scale: float = None, getSubDirsAsList=Fa
             )
     return sprites
 
+
 def load_assets_list(path, size: int = None, scale: float = None):
     sprites = []
     for file in listdir(path):
@@ -64,25 +65,42 @@ def load_assets_list(path, size: int = None, scale: float = None):
         if size is None and scale is None:
             sprites.append(pygame.image.load(join(path, file)))
         elif scale is not None:
-            sprites.append(pygame.transform.scale_by(
-                pygame.image.load(join(path, file)), scale
-            ))
+            sprites.append(
+                pygame.transform.scale_by(pygame.image.load(join(path, file)), scale)
+            )
         else:
-            sprites.append(pygame.transform.scale(
-                pygame.image.load(join(path, file)), size
-            ))
+            sprites.append(
+                pygame.transform.scale(pygame.image.load(join(path, file)), size)
+            )
     return sprites
 
 
-def convert_to_thread(func, fps):
-    def wrapper():
-        clock = pygame.time.Clock()
-        while True:
-            clock.tick(fps)
-            try:
-                func()
-            except:
-                return
+def convert_to_thread(func, fps, give_clock_to_func=False):
+    if give_clock_to_func:
+
+        def wrapper():
+            clock = pygame.time.Clock()
+            while True:
+                clock.tick(fps)
+                try:
+                    func(clock)
+                except Exception as error_message:
+                    print(
+                        "Error occured during runtime of function thread, it has been stoped."
+                    )
+                    print(f"#-------{error_message}-------#\n")
+                    return
+
+    else:
+
+        def wrapper():
+            clock = pygame.time.Clock()
+            while True:
+                clock.tick(fps)
+                try:
+                    func()
+                except Exception as error_message:
+                    return
+
     wrapper_thread = Thread(target=wrapper)
     return wrapper_thread
-

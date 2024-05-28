@@ -16,8 +16,8 @@ class Item:
     def display(self, window, pos):
         x, y = pos
         window.blit(assets[self.name], (x, y))
-        blit_text(window, self.name, (x + self.image_width + 5, y), size=15)
-        blit_text(window, self.count, pos, size=15)
+        blit_text(window, self.name, (x + self.image_width + 5, y), size=15, colour=(255, 255, 255))
+        blit_text(window, self.count, pos, size=15, colour=(255, 255, 255))
 
 
 class Object(pg.Rect):
@@ -86,35 +86,44 @@ class Gateway(Structure):
 
 
 class Spawner(Block):
-    def __init__(self, x, y, size, name, spawn_speed, monster, monster_name):
+    def __init__(self, x, y, size, name, spawn_speed, monster, monster_name, json_name):
         super().__init__(x, y, size, name)
         self.spawnSpeed = spawn_speed
         self.monster = monster
         self.monster_name = monster_name
+        self.monster_json_name = json_name
         self.cooldown = time()
 
     def script(self, *args):
         if time() - self.cooldown > self.spawnSpeed:
             self.cooldown = time()
             return self.monster(
-                self.x, self.y, player_width, player_height, self.monster_name
+                self.x, self.y, player_width, player_height, self.monster_name, self.monster_json_name
             )
 
 
 class Monster(pg.Rect):
-    def __init__(self, x, y, width, height, name, health=4, speed=0.25):
+    def __init__(self, x, y, width, height, name, json_name):
         super().__init__(x, y, width, height)
         self.name = name
         self.x_vel = 0
         self.y_vel = 0
-        self.speed = speed
-        self.maxSpeed = 2.5
+
+        # extracting json data
+        with open("object data/enemy.json") as file:
+            data = json.load(file)[json_name]
+            file.close()
+        self.maxSpeed = data["Max Speed"]
+        self.speed = data["Speed"]
+        self.health = data["Health"]
+
         self.isHit = False
         self.timeSinceLastHit = time()
-        self.health = health
         self.delay = 0.3 # time to show blood overlay
         self.animation_count = 0
         self.animate_speed = 3
+
+        return data
 
     def script(self, info_dict, *args):
         player_x, player_y = info_dict["player pos"]
@@ -219,17 +228,15 @@ class Sword(Item):
         window.blit(rotated_image, (rotated_image_rect.x - x_offset, rotated_image_rect.y - y_offset))
         return rotated_image_rect
     
+class Zombie(Monster):
+    def __init__(self, x, y, width, height, name, json_name):
+        super().__init__(x, y, width, height, name, json_name)
+
 class Robot(Monster):
-    def __init__(self, x, y, width, height, name=None):
-        super().__init__(x, y, width, height, name, None, None)
+    def __init__(self, x, y, width, height, *args):
+        data = super().__init__(x, y, width, height, None, "Robot")
         self.state = None
-        with open("object data/enemy.json") as file:
-            data = json.load(file)["Robot"]
-            self.maxSpeed = data["Max Speed"]
-            self.speed = data["Speed"]
-            self.animate_speed = data["Animate Speed"]
-            self.health = data["Health"]
-            file.close()
+        self.animate_speed = data["Animate Speed"]
 
     def display(self, window, x_offset, y_offset):
         if self.x_vel > 0:
