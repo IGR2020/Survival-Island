@@ -155,46 +155,48 @@ class Monster(pg.Rect):
         self.y += self.y_vel * dt
         by, bx = self.y // blockSize, self.centerx // blockSize
         if land[bx][by].name in (
-            "Calm Water.png",
-            "Calm Moderate Water.png",
-            "Calm Deep Water.png",
-            "Water.png",
+            "Calm Water",
+            "Calm Moderate Water",
+            "Calm Deep Water",
+            "Water",
         ) and self.colliderect(land[bx][by]):
             self.top = land[bx][by].bottom
         by, bx = self.bottom // blockSize, self.centerx // blockSize
         if land[bx][by].name in (
-            "Calm Water.png",
-            "Calm Moderate Water.png",
-            "Calm Deep Water.png",
-            "Water.png",
+            "Calm Water",
+            "Calm Moderate Water",
+            "Calm Deep Water",
+            "Water",
         ) and self.colliderect(land[bx][by]):
             self.bottom = land[bx][by].top
         self.x += self.x_vel * dt
         by, bx = self.centery // blockSize, self.x // blockSize
         if land[bx][by].name in (
-            "Calm Water.png",
-            "Calm Moderate Water.png",
-            "Calm Deep Water.png",
-            "Water.png",
+            "Calm Water",
+            "Calm Moderate Water",
+            "Calm Deep Water",
+            "Water",
         ) and self.colliderect(land[bx][by]):
             self.left = land[bx][by].right
         by, bx = self.centery // blockSize, self.right // blockSize
         if land[bx][by].name in (
-            "Calm Water.png",
-            "Calm Moderate Water.png",
-            "Calm Deep Water.png",
-            "Water.png",
+            "Calm Water",
+            "Calm Moderate Water",
+            "Calm Deep Water",
+            "Water",
         ) and self.colliderect(land[bx][by]):
             self.right = land[bx][by].left
 
     def display(self, window, x_offset, y_offset):
         window.blit(assets[self.name], (self.x - x_offset, self.y - y_offset))
         if self.isHit:
-            window.blit(assets["Blood Overlay.png"], (self.x - x_offset, self.y - y_offset))
+            window.blit(assets["Blood Overlay"], (self.x - x_offset, self.y - y_offset))
         if time() - self.timeSinceLastHit > self.delay:
             self.isHit = False
 
     def hit(self, damage) -> bool:
+        if time() - self.timeSinceLastHit < self.delay:
+            return
         self.health -= damage
         self.isHit = True
         self.x_vel = -self.x_vel * 20
@@ -206,7 +208,7 @@ class Monster(pg.Rect):
     
 class Sword(Item):
 
-    def  __init__(self, name="Black Sword.png", count=1, item_type="Tool", damage=1):
+    def  __init__(self, name="Black Sword", count=1, item_type="Tool", damage=1):
         self.correction_angle = 45
         self.damage = damage
         super().__init__(name, count, item_type)
@@ -248,6 +250,6 @@ class Robot(Monster):
         self.animation_count += 1
         window.blit(assets[self.state][(self.animation_count // self.animate_speed) % len(assets[self.state])], (self.x - x_offset, self.y - y_offset))
         if self.isHit:
-            window.blit(assets["Blood Overlay.png"], (self.x - x_offset, self.y - y_offset))
+            window.blit(assets["Blood Overlay"], (self.x - x_offset, self.y - y_offset))
         if time() - self.timeSinceLastHit > self.delay:
             self.isHit = False

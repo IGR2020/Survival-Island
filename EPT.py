@@ -40,18 +40,18 @@ def load_assets(path, size: int = None, scale: float = None, getSubDirsAsList=Fa
     sprites = {}
     for file in listdir(path):
         if getSubDirsAsList and isdir(join(path, file)):
-            sprites[file] = load_assets_list(join(path, file), size, scale)
+            sprites[file.replace(".png", "")] = load_assets_list(join(path, file), size, scale)
             continue
         elif not isfile(join(path, file)):
             continue
         if size is None and scale is None:
-            sprites[file] = pygame.image.load(join(path, file))
+            sprites[file.replace(".png", "")] = pygame.image.load(join(path, file))
         elif scale is not None:
-            sprites[file] = pygame.transform.scale_by(
+            sprites[file.replace(".png", "")] = pygame.transform.scale_by(
                 pygame.image.load(join(path, file)), scale
             )
         else:
-            sprites[file] = pygame.transform.scale(
+            sprites[file.replace(".png", "")] = pygame.transform.scale(
                 pygame.image.load(join(path, file)), size
             )
     return sprites

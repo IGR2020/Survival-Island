@@ -23,8 +23,8 @@ portal_time = time()
 x_offset, y_offset = 0, 0
 
 base_damage = 1
-player = Player(100, 100, "Player1.png")
-player.inventory.append(Sword(name="Long Sword.png"))
+player = Player(100, 100, "Player1")
+player.inventory.append(Sword(name="Long Sword"))
 current_land = 0
 
 correction_angle = 45
@@ -189,13 +189,13 @@ while run:
         if (
             player.colliderect(structure)
             and time() - portal_time > portal_travel_cooldown
-            and structure.name == "Gateway.png"
+            and structure.name == "Gateway"
         ):
             save_current_world()
             current_land = structure.land_link
             land, structures, spawn, spawners, monsters = load_current_world()
             for structure in structures:
-                if structure.name == "Gateway.png":
+                if structure.name == "Gateway":
                     player.topleft = structure.topleft
             portal_time = time()
             break

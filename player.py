@@ -47,35 +47,35 @@ class Player(pg.Rect):
         self.y += self.y_vel * dt
         by, bx = self.y // blockSize, self.centerx // blockSize
         if land[bx][by].name in (
-            "Calm Water.png",
-            "Calm Moderate Water.png",
-            "Calm Deep Water.png",
-            "Water.png",
+            "Calm Water",
+            "Calm Moderate Water",
+            "Calm Deep Water",
+            "Water",
         ) and self.colliderect(land[bx][by]):
             self.top = land[bx][by].bottom
         by, bx = self.bottom // blockSize, self.centerx // blockSize
         if land[bx][by].name in (
-            "Calm Water.png",
-            "Calm Moderate Water.png",
-            "Calm Deep Water.png",
-            "Water.png",
+            "Calm Water",
+            "Calm Moderate Water",
+            "Calm Deep Water",
+            "Water",
         ) and self.colliderect(land[bx][by]):
             self.bottom = land[bx][by].top
         self.x += self.x_vel * dt
         by, bx = self.centery // blockSize, self.x // blockSize
         if land[bx][by].name in (
-            "Calm Water.png",
-            "Calm Moderate Water.png",
-            "Calm Deep Water.png",
-            "Water.png",
+            "Calm Water",
+            "Calm Moderate Water",
+            "Calm Deep Water",
+            "Water",
         ) and self.colliderect(land[bx][by]):
             self.left = land[bx][by].right
         by, bx = self.centery // blockSize, self.right // blockSize
         if land[bx][by].name in (
-            "Calm Water.png",
-            "Calm Moderate Water.png",
-            "Calm Deep Water.png",
-            "Water.png",
+            "Calm Water",
+            "Calm Moderate Water",
+            "Calm Deep Water",
+            "Water",
         ) and self.colliderect(land[bx][by]):
             self.right = land[bx][by].left
 

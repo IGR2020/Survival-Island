@@ -20,7 +20,7 @@ assets.update(load_assets("assets/effects"))
 
 # filter settings
 darkness_size = 500
-assets["Darkness.png"] = pg.transform.scale(assets["Darkness.png"], (darkness_size, darkness_size))
+assets["Darkness"] = pg.transform.scale(assets["Darkness"], (darkness_size, darkness_size))
 assets["Filter"] = pg.surface.Surface((900, 500))
 
 landChaos = 0.02
