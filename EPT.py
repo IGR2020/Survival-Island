@@ -86,7 +86,7 @@ def convert_to_thread(func, fps, give_clock_to_func=False):
                     func(clock)
                 except Exception as error_message:
                     print(
-                        "Error occured during runtime of function thread, it has been stoped."
+                        "Error occured during runtime of function. The thread has been stoped."
                     )
                     print(f"#-------{error_message}-------#\n")
                     return
@@ -100,6 +100,10 @@ def convert_to_thread(func, fps, give_clock_to_func=False):
                 try:
                     func()
                 except Exception as error_message:
+                    print(
+                        "Error occured during runtime of function. The thread has been stoped."
+                    )
+                    print(f"#-------{error_message}-------#\n")
                     return
 
     wrapper_thread = Thread(target=wrapper)

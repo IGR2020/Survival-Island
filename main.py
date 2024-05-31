@@ -65,13 +65,13 @@ def mapBlocks(x_offset, y_offset):
 
 
 showDebug = False
+showDarkness = False
+mouse_down = False
 tool_rect = player.inventory[0].display_as_object(window, x_offset, y_offset, player)
 
 
 def display(internal_clock):
-    global tool_rect
-
-    x_offset, y_offset = player.x - WIDTH / 2, player.y - HEIGHT / 2
+    global tool_rect, x_offset, y_offset
 
     window.fill((29, 117, 139))
 
@@ -87,7 +87,8 @@ def display(internal_clock):
 
     player.display(window, x_offset, y_offset)
 
-    draw_darkness_filter_at_player(window, player, x_offset, y_offset)
+    if showDarkness:
+        draw_darkness_filter_at_player(window, player, x_offset, y_offset)
 
     y = 0
     for item in player.inventory:
@@ -95,19 +96,18 @@ def display(internal_clock):
         y += 32
 
     if showDebug:
-        blit_text(window, round(clock.get_fps()), (0, 0), colour=(255, 255, 255))
-        blit_text(window, round(internal_clock.get_fps()), (0, 50), colour=(255, 255, 255))
+        blit_text(window, round((clock.get_fps() + internal_clock.get_fps()) / 2), (0, 0))
 
     pg.display.update()
 
 
-display_thread = convert_to_thread(display, 60, True)
+display_thread = convert_to_thread(display, gameFPS, True)
 display_thread.start()
 
 
 while run:
 
-    delta_time = clock.tick(60) / 16
+    delta_time = clock.tick(gameFPS) / 16
 
     for event in pg.event.get():
 
@@ -119,6 +119,8 @@ while run:
             assets["Filter"] = pg.surface.Surface((WIDTH, HEIGHT))
 
         if event.type == pg.MOUSEBUTTONDOWN:
+            mouse_down = True
+
             offset_mouse_x, offset_mouse_y = pg.mouse.get_pos()
             offset_mouse_x += x_offset
             offset_mouse_y += y_offset
@@ -136,9 +138,34 @@ while run:
                             monsters.remove(monster)
                         break
 
+        if event.type == pg.MOUSEBUTTONUP:
+            mouse_down = False
+        
         if event.type == pg.KEYDOWN: 
+
             if event.key == pg.K_F3:
                 showDebug = not showDebug
+
+            if event.unicode == "~":
+                showDarkness = not showDarkness
+
+    if mouse_down:
+        offset_mouse_x, offset_mouse_y = pg.mouse.get_pos()
+        offset_mouse_x += x_offset
+        offset_mouse_y += y_offset
+        for structure in structures:
+            if structure.collidepoint((offset_mouse_x, offset_mouse_y)):
+                gain = structure.destroy()
+                if gain is not None:
+                    player.inventory = agrivate_inventory(player.inventory, [gain])
+                    structures.remove(structure)
+                break
+        else:
+            for monster in monsters:
+                if monster.colliderect(tool_rect):
+                    if monster.hit(base_damage + player.inventory[0].damage):
+                        monsters.remove(monster)
+                    break
 
     keys = pg.key.get_pressed()
 
@@ -156,6 +183,7 @@ while run:
         player.isMovingV = True
 
     player.script(land, delta_time)
+    x_offset, y_offset = player.x - WIDTH / 2, player.y - HEIGHT / 2
 
     for structure in structures:
         if (
