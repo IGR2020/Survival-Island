@@ -14,6 +14,7 @@ class Player(pg.Rect):
         self.isMovingH = False
         self.isMovingV = False
         self.inventory = []
+        self.health = 50
         return super().__init__(
             x, y, assets[self.name].get_width(), assets[self.name].get_height()
         )

@@ -209,9 +209,12 @@ class Monster(pg.Rect):
 class Sword(Item):
 
     def  __init__(self, name="Black Sword", count=1, item_type="Tool", damage=1):
-        self.correction_angle = 45
-        self.damage = damage
         super().__init__(name, count, item_type)
+        self.correction_angle = 45
+        with open("object data/items/weapons.json") as file:
+            data = json.load(file)[self.name]
+            file.close()
+        self.damage = data["Damage"]
 
     def display(self, window, pos):
         super().display(window, pos)
