@@ -28,3 +28,8 @@ seaChaos = 0.02
 grassChaos = 0.08
 
 gameFPS = 60
+
+healthBarWidth = 100
+healthBarHeight = 25
+
+hitCooldown = 0.3

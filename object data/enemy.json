@@ -1,4 +1,4 @@
 {
-    "Robot" : {"Health": 12, "Speed": 2, "Max Speed": 5.5, "Animate Speed": 16},
-    "Zombie" : {"Health": 10, "Speed": 1, "Max Speed": 3, "Animate Speed": null}
+    "Robot" : {"Health": 12, "Speed": 2, "Max Speed": 5.5, "Animate Speed": 16, "Damage": 2},
+    "Zombie" : {"Health": 10, "Speed": 1, "Max Speed": 3, "Animate Speed": null, "Damage": 1.5}
 }

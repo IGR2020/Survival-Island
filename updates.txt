@@ -23,3 +23,6 @@ Beta 1
     + json file loading
     + darkness effects
     + proformance upgrades (old 69 new ? on map 1 and old 49 new 55)
+
+Beta 2
+    + health and damage systems

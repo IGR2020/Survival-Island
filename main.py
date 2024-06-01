@@ -8,11 +8,12 @@ from math import ceil
 from EPT import blit_text, convert_to_thread
 from pygame.image import load
 from effects import draw_darkness_filter_at_player
+from ui import render_health
 
 WIDTH, HEIGHT = 900, 500
 window = pg.display.set_mode((WIDTH, HEIGHT), pg.RESIZABLE)
 pg.display.set_caption("Survival Island")
-pg.display.set_icon(load("assets/Icon.png"))
+pg.display.set_icon(load("assets/icons/Icon.png"))
 
 run = True
 clock = pg.time.Clock()
@@ -94,6 +95,8 @@ def display(internal_clock):
     for item in player.inventory:
         item.display(window, (0, y))
         y += 32
+
+    render_health(window, player.health, player.maxHealth, (0, 0))
 
     if showDebug:
         blit_text(window, round((clock.get_fps() + internal_clock.get_fps()) / 2), (0, 0))
@@ -215,6 +218,8 @@ while run:
                 "window size": (WIDTH, HEIGHT),
             }
         )
+        if player.colliderect(monster):
+            player.hit(monster.damage)
 
 pg.quit()
 quit()

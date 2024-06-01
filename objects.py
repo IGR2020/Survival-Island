@@ -19,6 +19,10 @@ class Item:
         blit_text(window, self.name, (x + self.image_width + 5, y), size=15, colour=(255, 255, 255))
         blit_text(window, self.count, pos, size=15, colour=(255, 255, 255))
 
+    def __eq__(self, value: object) -> bool:
+        if isinstance(value, Item): return value.name == self.name
+        return False
+
 
 class Object(pg.Rect):
     def __init__(self, x, y, width, height, name):
@@ -116,16 +120,17 @@ class Monster(pg.Rect):
         self.maxSpeed = data["Max Speed"]
         self.speed = data["Speed"]
         self.health = data["Health"]
+        self.damage = data["Damage"]
 
         self.isHit = False
         self.timeSinceLastHit = time()
-        self.delay = 0.3 # time to show blood overlay
         self.animation_count = 0
         self.animate_speed = 3
 
         return data
 
     def script(self, info_dict, *args):
+
         player_x, player_y = info_dict["player pos"]
         dt = info_dict["delta time"]
         land = info_dict["land"]
@@ -191,11 +196,11 @@ class Monster(pg.Rect):
         window.blit(assets[self.name], (self.x - x_offset, self.y - y_offset))
         if self.isHit:
             window.blit(assets["Blood Overlay"], (self.x - x_offset, self.y - y_offset))
-        if time() - self.timeSinceLastHit > self.delay:
+        if time() - self.timeSinceLastHit > hitCooldown:
             self.isHit = False
 
     def hit(self, damage) -> bool:
-        if time() - self.timeSinceLastHit < self.delay:
+        if time() - self.timeSinceLastHit < hitCooldown:
             return
         self.health -= damage
         self.isHit = True
@@ -254,5 +259,5 @@ class Robot(Monster):
         window.blit(assets[self.state][(self.animation_count // self.animate_speed) % len(assets[self.state])], (self.x - x_offset, self.y - y_offset))
         if self.isHit:
             window.blit(assets["Blood Overlay"], (self.x - x_offset, self.y - y_offset))
-        if time() - self.timeSinceLastHit > self.delay:
+        if time() - self.timeSinceLastHit > hitCooldown:
             self.isHit = False

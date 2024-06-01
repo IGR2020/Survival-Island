@@ -1,26 +1,44 @@
 import pygame as pg
-from assets import assets, blockSize
-from objects import Item
+from assets import assets, blockSize, hitCooldown
+from time import time
 
 
 class Player(pg.Rect):
 
     def __init__(self, x, y, name) -> None:
+
         self.name = name
+        
+        # movement
         self.x_vel = 0
         self.y_vel = 0
         self.speed = 0.5
         self.maxSpeed = 5
         self.isMovingH = False
         self.isMovingV = False
+        
         self.inventory = []
+        self.held = None
+        
+        # health
         self.health = 50
+        self.maxHealth = 50
+        self.is_hit = False
+        self.timeSinceLastHit = time()
+        
         return super().__init__(
             x, y, assets[self.name].get_width(), assets[self.name].get_height()
         )
 
     def display(self, window: pg.Surface, x_offset=0, y_offset=0):
         window.blit(assets[self.name], (self.x - x_offset, self.y - y_offset))
+
+    def hit(self, damage):
+        if time() - self.timeSinceLastHit < hitCooldown:
+            return
+        self.health -= damage
+        self.timeSinceLastHit = time()
+        self.is_hit = True
 
     def moveLeft(self):
         self.x_vel -= self.speed
@@ -45,6 +63,9 @@ class Player(pg.Rect):
         self.y_vel = 0
 
     def script(self, land, dt):
+        if self.hit and time() - self.timeSinceLastHit > hitCooldown:
+            self.is_hit = False
+
         self.y += self.y_vel * dt
         by, bx = self.y // blockSize, self.centerx // blockSize
         if land[bx][by].name in (
@@ -93,7 +114,7 @@ class Player(pg.Rect):
 def agrivate_inventory(inv1, inv2):
     for i2, item2 in enumerate(inv2):
         for i1, item1 in enumerate(inv1):
-            if item1.name == item2.name:
+            if item1 == item2:
                 inv1[i1].count += item2.count
                 break
         else:
