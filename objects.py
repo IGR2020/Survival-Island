@@ -4,20 +4,19 @@ from time import time
 from EPT import blit_text
 from math import degrees, atan2
 import json
+from random import randint
 
 
 class Item:
     def __init__(self, name, count, item_type="Item"):
         self.name = name
         self.count = count
-        self.image_width = assets[self.name].get_width()
         self.type = item_type
 
     def display(self, window, pos):
         x, y = pos
         window.blit(assets[self.name], (x, y))
-        blit_text(window, self.name, (x + self.image_width + 5, y), size=15, colour=(255, 255, 255))
-        blit_text(window, self.count, pos, size=15, colour=(255, 255, 255))
+        blit_text(window, self.count, (x, y), size=15)
 
     def __eq__(self, value: object) -> bool:
         if isinstance(value, Item): return value.name == self.name
@@ -121,6 +120,9 @@ class Monster(pg.Rect):
         self.speed = data["Speed"]
         self.health = data["Health"]
         self.damage = data["Damage"]
+        self.value = []
+        for value in data["Value"]:
+            self.value.append(Item(value["Name"], randint(*value["Drop Range"])))
 
         self.isHit = False
         self.timeSinceLastHit = time()
@@ -232,7 +234,7 @@ class Sword(Item):
         dx, dy = offset_mouse_x - player.centerx, offset_mouse_y - player.centery
         angle = degrees(atan2(-dy, dx)) - self.correction_angle
 
-        rotated_image = pg.transform.rotate(assets[self.name], angle)
+        rotated_image = pg.transform.rotate(assets[self.name + " Centre"], angle)
         rotated_image_rect = rotated_image.get_rect(center=player.center)
 
         window.blit(rotated_image, (rotated_image_rect.x - x_offset, rotated_image_rect.y - y_offset))

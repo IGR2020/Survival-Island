@@ -1,4 +1,18 @@
 {
-    "Robot" : {"Health": 12, "Speed": 2, "Max Speed": 5.5, "Animate Speed": 16, "Damage": 2},
-    "Zombie" : {"Health": 10, "Speed": 1, "Max Speed": 3, "Animate Speed": null, "Damage": 1.5}
+    "Robot": {
+        "Health": 12,
+        "Speed": 2,
+        "Max Speed": 5.5,
+        "Animate Speed": 16,
+        "Damage": 2,
+        "Value": [{"Name": "Magma Ore", "Drop Range": [1, 5]}]
+    },
+    "Zombie": {
+        "Health": 10,
+        "Speed": 1,
+        "Max Speed": 3,
+        "Animate Speed": null,
+        "Damage": 1.5,
+        "Value": [{"Name": "Flesh", "Drop Range": [1, 3]}]
+    }
 }

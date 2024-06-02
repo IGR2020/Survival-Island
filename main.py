@@ -4,7 +4,7 @@ from land import get_world_from_directory
 from assets import *
 from time import time
 from objects import Sword
-from math import ceil
+from math import ceil, floor
 from EPT import blit_text, convert_to_thread
 from pygame.image import load
 from effects import draw_darkness_filter_at_player
@@ -25,7 +25,7 @@ x_offset, y_offset = 0, 0
 
 base_damage = 1
 player = Player(100, 100, "Player1")
-player.inventory.append(Sword(name="Long Sword"))
+player.inventory[0].item = (Sword(name="Long Sword"))
 current_land = 0
 
 correction_angle = 45
@@ -55,24 +55,21 @@ player.topleft = spawn
 
 
 def mapBlocks(x_offset, y_offset):
-    try:
-        [
-            land[x][y].display(window, x_offset, y_offset)
-            for x in range(min(ceil((WIDTH + x_offset) / blockSize), len(land)-1))
-            for y in range(min(ceil((HEIGHT + y_offset) / blockSize), len(land[0])-1))
-        ]
-    except IndexError:
-        pass
+    [
+        land[x][y].display(window, x_offset, y_offset)
+        for x in range(max(floor((x_offset) / blockSize), 0),min(ceil((WIDTH + x_offset) / blockSize), len(land)-1))
+        for y in range(max(floor((y_offset) / blockSize), 0), min(ceil((HEIGHT + y_offset) / blockSize), len(land[0])-1))
+    ]
 
 
 showDebug = False
 showDarkness = False
 mouse_down = False
-tool_rect = player.inventory[0].display_as_object(window, x_offset, y_offset, player)
+tool_rect = player.inventory[0].item.display_as_object(window, x_offset, y_offset, player)
 
 
 def display(internal_clock):
-    global tool_rect, x_offset, y_offset
+    global tool_rect, x_offset, y_offset, gameFPS
 
     window.fill((29, 117, 139))
 
@@ -84,22 +81,21 @@ def display(internal_clock):
     for monster in monsters:
         monster.display(window, x_offset, y_offset)
 
-    tool_rect = player.inventory[0].display_as_object(window, x_offset, y_offset, player)
+    tool_rect = player.inventory[0].item.display_as_object(window, x_offset, y_offset, player)
 
     player.display(window, x_offset, y_offset)
 
     if showDarkness:
         draw_darkness_filter_at_player(window, player, x_offset, y_offset)
 
-    y = 0
-    for item in player.inventory:
-        item.display(window, (0, y))
-        y += 32
-
+    for slot in player.inventory:
+        slot.display(window)
     render_health(window, player.health, player.maxHealth, (0, 0))
 
     if showDebug:
-        blit_text(window, round((clock.get_fps() + internal_clock.get_fps()) / 2), (0, 0))
+        averageFPS = round((clock.get_fps() + internal_clock.get_fps()) / 2)
+        blit_text(window, averageFPS, (0, 0))
+
 
     pg.display.update()
 
@@ -131,13 +127,14 @@ while run:
                 if structure.collidepoint((offset_mouse_x, offset_mouse_y)):
                     gain = structure.destroy()
                     if gain is not None:
-                        player.inventory = agrivate_inventory(player.inventory, [gain])
+                        player.inventory = agrivate_inventory(player.inventory, gain)
                         structures.remove(structure)
                     break
             else:
                 for monster in monsters:
                     if monster.colliderect(tool_rect):
-                        if monster.hit(base_damage + player.inventory[0].damage):
+                        if monster.hit(base_damage + player.inventory[0].item.damage):
+                            agrivate_inventory(player.inventory, monster.value)
                             monsters.remove(monster)
                         break
 
@@ -160,13 +157,14 @@ while run:
             if structure.collidepoint((offset_mouse_x, offset_mouse_y)):
                 gain = structure.destroy()
                 if gain is not None:
-                    player.inventory = agrivate_inventory(player.inventory, [gain])
+                    player.inventory = agrivate_inventory(player.inventory, gain)
                     structures.remove(structure)
                 break
         else:
             for monster in monsters:
                 if monster.colliderect(tool_rect):
-                    if monster.hit(base_damage + player.inventory[0].damage):
+                    if monster.hit(base_damage + player.inventory[0].item.damage):
+                        agrivate_inventory(player.inventory, monster.value)
                         monsters.remove(monster)
                     break
 

@@ -1,6 +1,17 @@
 import pygame as pg
-from assets import assets, blockSize, hitCooldown
+from assets import *
 from time import time
+from ui import find_slot
+
+class Slot(pg.Rect):
+    def __init__(self, x, y, width, height, item=None):
+        super().__init__(x, y, width, height)
+        self.item = item
+
+    def display(self, window):
+        window.blit(assets["Slot"], self)
+        if self.item is not None:
+            self.item.display(window, (self.x + 8, self.y + 8))
 
 
 class Player(pg.Rect):
@@ -18,6 +29,8 @@ class Player(pg.Rect):
         self.isMovingV = False
         
         self.inventory = []
+        for x in range(150//slotSize, 750//slotSize):
+            self.inventory.append(Slot(x * slotSize, 500 - slotSize, slotSize, slotSize))
         self.held = None
         
         # health
@@ -112,12 +125,14 @@ class Player(pg.Rect):
 
 
 def agrivate_inventory(inv1, inv2):
-    for i2, item2 in enumerate(inv2):
-        for i1, item1 in enumerate(inv1):
-            if item1 == item2:
-                inv1[i1].count += item2.count
-                break
-        else:
-            inv1.append(item2)
-
+    """Inventory 1 should be player style inventory"""
+    for item in inv2:
+        slotFound = find_slot(item, inv1)
+        if slotFound is None:
+            continue
+        if inv1[slotFound].item is None:
+            inv1[slotFound].item = item
+            continue
+        inv1[slotFound].item.count += item.count
     return inv1
+    

@@ -43,7 +43,7 @@ def get_land_from_image(image_path, water_land_check=True, create_gateway = Fals
             if data[x, y] == (239, 228, 176, 255):
                 if randint(0, 1) == 0: land[-1].append(Block(x*blockSize, y*blockSize, blockSize, "Sand"))
                 else: land[-1].append(Block(x*blockSize, y*blockSize, blockSize, "Flat Sand"))
-                if randint(0, 40) == 0: structures.append(Structure(x*blockSize - treeSize/3, y*blockSize - treeSize/3, choice(("Palm Tree1", "Palm Tree2", "Palm Tree3")), Item("Wood", randint(1, 6))))
+                if randint(0, 40) == 0: structures.append(Structure(x*blockSize - treeSize/3, y*blockSize - treeSize/3, choice(("Palm Tree1", "Palm Tree2", "Palm Tree3")), [Item("Wood", randint(1, 6))]))
             elif data[x, y] == (34, 177, 76, 255):
                 land[-1].append(get_grass_type_by_noise(x, y, grass_noise))
                 structure_added = get_grass_tree_by_noise(x, y, grass_noise)
@@ -114,15 +114,15 @@ def get_grass_type_by_noise(x, y, grass_noise):
     
 def get_grass_tree_by_noise(x, y, grass_noise):
     if abs(grass_noise((x*grassChaos, y*grassChaos))) > 0.4:
-        if randint(0, 2) == 0: return (Structure(x*blockSize - treeSize/3, y*blockSize - treeSize/4, "Tree1", Item("Wood", randint(2, 9))))
+        if randint(0, 2) == 0: return (Structure(x*blockSize - treeSize/3, y*blockSize - treeSize/4, "Tree1", [Item("Wood", randint(2, 9))]))
     elif abs(grass_noise((x*grassChaos, y*grassChaos))) > 0.3:
-        if randint(0, 7) == 0: return Structure(x*blockSize - treeSize/3, y*blockSize - treeSize/4, "Tree1", Item("Wood", randint(2, 9)))
+        if randint(0, 7) == 0: return Structure(x*blockSize - treeSize/3, y*blockSize - treeSize/4, "Tree1", [Item("Wood", randint(2, 9))])
     elif abs(grass_noise((x*grassChaos, y*grassChaos))) > 0.2:
-        if randint(0, 10) == 0: return Structure(x*blockSize - treeSize/3, y*blockSize - treeSize/4, "Tree1", Item("Wood", randint(2, 9)))
+        if randint(0, 10) == 0: return Structure(x*blockSize - treeSize/3, y*blockSize - treeSize/4, "Tree1", [Item("Wood", randint(2, 9))])
     elif abs(grass_noise((x*grassChaos, y*grassChaos))) > 0.1:
-        if randint(0, 15) == 0: return Structure(x*blockSize - treeSize/3, y*blockSize - treeSize/4, "Tree1", Item("Wood", randint(2, 9)))
+        if randint(0, 15) == 0: return Structure(x*blockSize - treeSize/3, y*blockSize - treeSize/4, "Tree1", [Item("Wood", randint(2, 9))])
     else:
-        if randint(0, 21) == 0: return Structure(x*blockSize - treeSize/3, y*blockSize - treeSize/4, "Tree1", Item("Wood", randint(2, 9)))
+        if randint(0, 21) == 0: return Structure(x*blockSize - treeSize/3, y*blockSize - treeSize/4, "Tree1", [Item("Wood", randint(2, 9))])
 
 
 def get_world_from_directory(dir_path, water_land_check=True, create_land_links=False):

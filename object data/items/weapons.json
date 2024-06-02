@@ -1,5 +1,6 @@
 {
     "Black Sword": {"Damage": 2.0},
     "Long Sword": {"Damage": 2.2},
-    "Mace": {"Damage": 4}
+    "Mace": {"Damage": 4},
+    "Magma Sword": {"Damage": 3.3}
 }

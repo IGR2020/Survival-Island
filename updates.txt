@@ -18,11 +18,13 @@ Alpha 3
 
 Beta 1
     + tile refrence collision
-    + proformance upgrades (old 67 new 69 on map 1 and old 45 new 49)
+    + proformance upgrades (old 67 new 69 on map 1 and old 45 new 49 on big map)
     + robot spawing
     + json file loading
     + darkness effects
-    + proformance upgrades (old 69 new ? on map 1 and old 49 new 55)
+    + proformance upgrades (old 69 new ? on map 1 and old 49 new 55 on big map)
 
 Beta 2
     + health and damage systems
+    + proformance upgrades (old ?/69 new 72 on map 1 and old 55 new 67 on big map)
+    + sword alignment fixed
