@@ -55,11 +55,14 @@ player.topleft = spawn
 
 
 def mapBlocks(x_offset, y_offset):
-    [
-        land[x][y].display(window, x_offset, y_offset)
-        for x in range(max(floor((x_offset) / blockSize), 0),min(ceil((WIDTH + x_offset) / blockSize), len(land)-1))
-        for y in range(max(floor((y_offset) / blockSize), 0), min(ceil((HEIGHT + y_offset) / blockSize), len(land[0])-1))
-    ]
+    try:
+        [
+            land[x][y].display(window, x_offset, y_offset)
+            for x in range(max(floor((x_offset) / blockSize), 0),min(ceil((WIDTH + x_offset) / blockSize), len(land)-1))
+            for y in range(max(floor((y_offset) / blockSize), 0), min(ceil((HEIGHT + y_offset) / blockSize), len(land[0])-1))
+        ]
+    except IndexError:
+        pass
 
 
 showDebug = False
