@@ -217,22 +217,24 @@ class Sword(Item):
 
     def  __init__(self, name="Black Sword", count=1, item_type="Tool"):
         super().__init__(name, count, item_type)
-        self.correction_angle = 45
         with open("object data/items/weapons.json") as file:
             data = json.load(file)[self.name]
             file.close()
         self.damage = data["Damage"]
+        self.attack = False
+        self.angle = 45
 
     def display(self, window, pos):
         super().display(window, pos)
 
     def display_as_object(self, window, x_offset, y_offset, player):
 
-        offset_mouse_x, offset_mouse_y = pg.mouse.get_pos()
-        offset_mouse_x += x_offset
-        offset_mouse_y += y_offset
-        dx, dy = offset_mouse_x - player.centerx, offset_mouse_y - player.centery
-        angle = degrees(atan2(-dy, dx)) - self.correction_angle
+        if self.attack:
+            self.angle += swordRotateSpeed
+            if self.angle > 359:
+                self.angle = 0
+
+        angle = self.angle
 
         rotated_image = pg.transform.rotate(assets[self.name + " Centre"], angle)
         rotated_image_rect = rotated_image.get_rect(center=player.center)

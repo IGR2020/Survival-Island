@@ -5,7 +5,7 @@ from assets import *
 from time import time
 from objects import Sword
 from math import ceil, floor
-from EPT import blit_text, convert_to_thread
+from EPT import blit_text, convert_to_thread, Button
 from pygame.image import load
 from effects import draw_darkness_filter_at_player
 from ui import render_health
@@ -18,6 +18,14 @@ pg.display.set_icon(load("assets/icons/Icon.png"))
 run = True
 clock = pg.time.Clock()
 FPS = 60
+
+# Android Support
+button_size = 48
+up_button = Button((button_size, HEIGHT - button_size*3), assets["Up Button"])
+down_button = Button((button_size, HEIGHT - button_size), assets["Down Button"])
+left_button = Button((0, HEIGHT - button_size*2), assets["Left Button"])
+right_button = Button((button_size*2, HEIGHT - button_size*2), assets["Right Button"])
+attack_button = Button((WIDTH - button_size*2, HEIGHT - button_size*2), assets["Attack Button"])
 
 portal_travel_cooldown = 0.5
 portal_time = time()
@@ -111,6 +119,12 @@ def display(internal_clock):
         else: slot.display(window, False)
     render_health(window, player.health, player.maxHealth, (0, 0))
 
+    up_button.display(window)
+    down_button.display(window)
+    left_button.display(window)
+    right_button.display(window)
+    attack_button.display(window)
+
     if showDebug:
         averageFPS = round((clock.get_fps() + internal_clock.get_fps()) / 2)
         blit_text(window, averageFPS, (0, 0))
@@ -137,36 +151,14 @@ while run:
             assets["Filter"] = pg.surface.Surface((WIDTH, HEIGHT))
 
         if event.type == pg.MOUSEBUTTONDOWN:
-            if event.button == 1:
-                mouse_down = True
+            mouse_down = True
 
-                offset_mouse_x, offset_mouse_y = pg.mouse.get_pos()
-                offset_mouse_x += x_offset
-                offset_mouse_y += y_offset
-                for structure in structures:
-                    if structure.collidepoint((offset_mouse_x, offset_mouse_y)):
-                        gain = structure.destroy()
-                        if gain is not None:
-                            player.inventory = agrivate_inventory(
-                                player.inventory, gain
-                            )
-                            structures.remove(structure)
-                        break
-                else:
-                    if tool_rect is None:
-                        continue
-                    for monster in monsters:
-                        if monster.colliderect(tool_rect):
-                            if monster.hit(
-                                base_damage + player.inventory[0].item.damage
-                            ):
-                                agrivate_inventory(player.inventory, monster.value)
-                                monsters.remove(monster)
-                            break
+            mouse_pos = pg.mouse.get_pos()
 
-        if event.type == pg.MOUSEWHEEL:
-            player.selected_slot += event.y
-            player.selected_slot = min(max(player.selected_slot, 0), 9)
+            for i, slot in enumerate(player.inventory):
+                if slot.collidepoint(mouse_pos):
+                    player.selected_slot = i
+                    break
 
         if event.type == pg.MOUSEBUTTONUP:
             mouse_down = False
@@ -179,7 +171,7 @@ while run:
             if event.unicode == "~":
                 showDarkness = not showDarkness
 
-    if mouse_down and tool_rect is not None:
+    if mouse_down:
         offset_mouse_x, offset_mouse_y = pg.mouse.get_pos()
         offset_mouse_x += x_offset
         offset_mouse_y += y_offset
@@ -191,27 +183,35 @@ while run:
                     structures.remove(structure)
                 break
         else:
-            for monster in monsters:
-                if monster.colliderect(tool_rect):
-                    if monster.hit(base_damage + player.inventory[0].item.damage):
-                        agrivate_inventory(player.inventory, monster.value)
-                        monsters.remove(monster)
-                    break
+            if attack_button.clicked() and tool_rect is not None:
+                if player.inventory[player.selected_slot].item is not None:
+                    if player.inventory[player.selected_slot].item.type == "Tool":
+                        player.inventory[player.selected_slot].item.attack = True
+                for monster in monsters:
+                    if monster.colliderect(tool_rect):
+                        if monster.hit(base_damage + player.inventory[0].item.damage):
+                            agrivate_inventory(player.inventory, monster.value)
+                            monsters.remove(monster)
+                        break
+    else:
+        if player.inventory[player.selected_slot].item is not None:
+            if player.inventory[player.selected_slot].item.type == "Tool":
+                player.inventory[player.selected_slot].item.attack = False
+        
 
-    keys = pg.key.get_pressed()
-
-    if keys[pg.K_a]:
-        player.moveLeft()
-        player.isMovingH = True
-    if keys[pg.K_d]:
-        player.moveRight()
-        player.isMovingH = True
-    if keys[pg.K_w]:
-        player.moveUp()
-        player.isMovingV = True
-    if keys[pg.K_s]:
-        player.moveDown()
-        player.isMovingV = True
+    if mouse_down:
+        if left_button.clicked():
+            player.moveLeft()
+            player.isMovingH = True
+        if right_button.clicked():
+            player.moveRight()
+            player.isMovingH = True
+        if up_button.clicked():
+            player.moveUp()
+            player.isMovingV = True
+        if down_button.clicked():
+            player.moveDown()
+            player.isMovingV = True
 
     player.script(land, delta_time)
     x_offset, y_offset = player.x - WIDTH / 2, player.y - HEIGHT / 2

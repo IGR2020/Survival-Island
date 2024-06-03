@@ -49,6 +49,7 @@ healthBarWidth = 100
 healthBarHeight = 25
 
 hitCooldown = 0.3
+swordRotateSpeed = 3
 
 slotSize = 48
 playerHotbarSlots = list(range(10))
