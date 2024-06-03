@@ -215,7 +215,7 @@ class Monster(pg.Rect):
     
 class Sword(Item):
 
-    def  __init__(self, name="Black Sword", count=1, item_type="Tool", damage=1):
+    def  __init__(self, name="Black Sword", count=1, item_type="Tool"):
         super().__init__(name, count, item_type)
         self.correction_angle = 45
         with open("object data/items/weapons.json") as file:

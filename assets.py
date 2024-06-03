@@ -41,6 +41,8 @@ landChaos = 0.02
 seaChaos = 0.02
 grassChaos = 0.08
 
+spawnerSpeedRange = [i*0.1 for i in range(15, 120)]
+
 gameFPS = 60
 
 healthBarWidth = 100
@@ -49,3 +51,4 @@ healthBarHeight = 25
 hitCooldown = 0.3
 
 slotSize = 48
+playerHotbarSlots = list(range(10))

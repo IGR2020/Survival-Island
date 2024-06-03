@@ -8,8 +8,9 @@ class Slot(pg.Rect):
         super().__init__(x, y, width, height)
         self.item = item
 
-    def display(self, window):
-        window.blit(assets["Slot"], self)
+    def display(self, window, is_selected_slot):
+        if is_selected_slot: window.blit(assets["Selected Slot"], self)
+        else: window.blit(assets["Slot"], self)
         if self.item is not None:
             self.item.display(window, (self.x + 8, self.y + 8))
 
@@ -29,9 +30,10 @@ class Player(pg.Rect):
         self.isMovingV = False
         
         self.inventory = []
-        for x in range(150//slotSize, 750//slotSize):
+        for x in range(200//slotSize, 700//slotSize):
             self.inventory.append(Slot(x * slotSize, 500 - slotSize, slotSize, slotSize))
         self.held = None
+        self.selected_slot = 0
         
         # health
         self.health = 50

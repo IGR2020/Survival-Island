@@ -25,7 +25,7 @@ x_offset, y_offset = 0, 0
 
 base_damage = 1
 player = Player(100, 100, "Player1")
-player.inventory[0].item = (Sword(name="Long Sword"))
+player.inventory[0].item = Sword(name="Magma Sword")
 current_land = 0
 
 correction_angle = 45
@@ -58,8 +58,14 @@ def mapBlocks(x_offset, y_offset):
     try:
         [
             land[x][y].display(window, x_offset, y_offset)
-            for x in range(max(floor((x_offset) / blockSize), 0),min(ceil((WIDTH + x_offset) / blockSize), len(land)-1))
-            for y in range(max(floor((y_offset) / blockSize), 0), min(ceil((HEIGHT + y_offset) / blockSize), len(land[0])-1))
+            for x in range(
+                max(floor((x_offset) / blockSize), 0),
+                min(ceil((WIDTH + x_offset) / blockSize), len(land) - 1),
+            )
+            for y in range(
+                max(floor((y_offset) / blockSize), 0),
+                min(ceil((HEIGHT + y_offset) / blockSize), len(land[0]) - 1),
+            )
         ]
     except IndexError:
         pass
@@ -68,7 +74,8 @@ def mapBlocks(x_offset, y_offset):
 showDebug = False
 showDarkness = False
 mouse_down = False
-tool_rect = player.inventory[0].item.display_as_object(window, x_offset, y_offset, player)
+
+tool_rect = None
 
 
 def display(internal_clock):
@@ -77,28 +84,36 @@ def display(internal_clock):
     window.fill((29, 117, 139))
 
     mapBlocks(x_offset, y_offset)
-    
+
     for structure in structures:
         structure.display(window, x_offset, y_offset)
 
     for monster in monsters:
         monster.display(window, x_offset, y_offset)
 
-    tool_rect = player.inventory[0].item.display_as_object(window, x_offset, y_offset, player)
+    if player.inventory[player.selected_slot].item is not None:
+        if player.inventory[player.selected_slot].item.type == "Tool":
+            tool_rect = player.inventory[player.selected_slot].item.display_as_object(
+                window, x_offset, y_offset, player
+            )
+        else:
+            None
+    else:
+        None
 
     player.display(window, x_offset, y_offset)
 
     if showDarkness:
         draw_darkness_filter_at_player(window, player, x_offset, y_offset)
 
-    for slot in player.inventory:
-        slot.display(window)
+    for i, slot in enumerate(player.inventory):
+        if i == player.selected_slot: slot.display(window, True)
+        else: slot.display(window, False)
     render_health(window, player.health, player.maxHealth, (0, 0))
 
     if showDebug:
         averageFPS = round((clock.get_fps() + internal_clock.get_fps()) / 2)
         blit_text(window, averageFPS, (0, 0))
-
 
     pg.display.update()
 
@@ -106,10 +121,11 @@ def display(internal_clock):
 display_thread = convert_to_thread(display, gameFPS, True)
 display_thread.start()
 
-
 while run:
 
     delta_time = clock.tick(gameFPS) / 16
+    if delta_time > 5:
+        delta_time = 0
 
     for event in pg.event.get():
 
@@ -121,30 +137,41 @@ while run:
             assets["Filter"] = pg.surface.Surface((WIDTH, HEIGHT))
 
         if event.type == pg.MOUSEBUTTONDOWN:
-            mouse_down = True
+            if event.button == 1:
+                mouse_down = True
 
-            offset_mouse_x, offset_mouse_y = pg.mouse.get_pos()
-            offset_mouse_x += x_offset
-            offset_mouse_y += y_offset
-            for structure in structures:
-                if structure.collidepoint((offset_mouse_x, offset_mouse_y)):
-                    gain = structure.destroy()
-                    if gain is not None:
-                        player.inventory = agrivate_inventory(player.inventory, gain)
-                        structures.remove(structure)
-                    break
-            else:
-                for monster in monsters:
-                    if monster.colliderect(tool_rect):
-                        if monster.hit(base_damage + player.inventory[0].item.damage):
-                            agrivate_inventory(player.inventory, monster.value)
-                            monsters.remove(monster)
+                offset_mouse_x, offset_mouse_y = pg.mouse.get_pos()
+                offset_mouse_x += x_offset
+                offset_mouse_y += y_offset
+                for structure in structures:
+                    if structure.collidepoint((offset_mouse_x, offset_mouse_y)):
+                        gain = structure.destroy()
+                        if gain is not None:
+                            player.inventory = agrivate_inventory(
+                                player.inventory, gain
+                            )
+                            structures.remove(structure)
                         break
+                else:
+                    if tool_rect is None:
+                        continue
+                    for monster in monsters:
+                        if monster.colliderect(tool_rect):
+                            if monster.hit(
+                                base_damage + player.inventory[0].item.damage
+                            ):
+                                agrivate_inventory(player.inventory, monster.value)
+                                monsters.remove(monster)
+                            break
+
+        if event.type == pg.MOUSEWHEEL:
+            player.selected_slot += event.y
+            player.selected_slot = min(max(player.selected_slot, 0), 9)
 
         if event.type == pg.MOUSEBUTTONUP:
             mouse_down = False
-        
-        if event.type == pg.KEYDOWN: 
+
+        if event.type == pg.KEYDOWN:
 
             if event.key == pg.K_F3:
                 showDebug = not showDebug
@@ -152,7 +179,7 @@ while run:
             if event.unicode == "~":
                 showDarkness = not showDarkness
 
-    if mouse_down:
+    if mouse_down and tool_rect is not None:
         offset_mouse_x, offset_mouse_y = pg.mouse.get_pos()
         offset_mouse_x += x_offset
         offset_mouse_y += y_offset

@@ -51,8 +51,8 @@ def get_land_from_image(image_path, water_land_check=True, create_gateway = Fals
                     structures.append(structure_added)
             elif data[x, y] == (127, 127, 127, 255):
                 spawners.append((x, y))
-                if randint(0, 1) == 0: land[-1].append(Spawner(x*blockSize, y*blockSize, blockSize, "Monster Spawner", 3, Zombie, "Zombie1", "Zombie"))
-                else: land[-1].append(Spawner(x*blockSize, y*blockSize, blockSize, "Monster Spawner", 3, Robot, "Zombie1", "Robot"))
+                if randint(0, 1) == 0: land[-1].append(Spawner(x*blockSize, y*blockSize, blockSize, "Monster Spawner", choice(spawnerSpeedRange), Zombie, "Zombie1", "Zombie"))
+                else: land[-1].append(Spawner(x*blockSize, y*blockSize, blockSize, "Monster Spawner", choice(spawnerSpeedRange), Robot, "Zombie1", "Robot"))
             elif data[x, y] == (163, 73, 164, 255):
                 gateway_point = (x*blockSize - treeSize/3, y*blockSize - treeSize/3)
                 land[-1].append(Block(x*blockSize, y*blockSize, blockSize, "Gateway Point"))

@@ -1,7 +1,5 @@
 from assets import *
 import pygame as pg
-from objects import Item
-from EPT import blit_text
 
 
 # finds available or matching slots for an item

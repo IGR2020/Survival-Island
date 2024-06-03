@@ -28,3 +28,4 @@ Beta 2
     + health and damage systems
     + proformance upgrades (old ?/69 new 72 on map 1 and old 55 new 67 on big map)
     + sword alignment fixed
+    + hotbar selection
