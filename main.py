@@ -1,22 +1,39 @@
 import pygame as pg
-from player import Player, agrivate_inventory
-from land import get_world_from_directory
-from assets import *
-from time import time
-from objects import Sword
-from math import ceil, floor
-from EPT import blit_text, Button
-from pygame.image import load
-from effects import draw_darkness_filter_at_player
-from ui import render_health
 import tkinter
+from assets import *
 
 MONITER_WIDTH, MONITER_HEIGHT = tkinter.Tk().winfo_screenwidth(), tkinter.Tk().winfo_screenheight()
 
 WIDTH, HEIGHT = 900, 500
 window = pg.display.set_mode((WIDTH, HEIGHT), flags=pg.RESIZABLE)
 pg.display.set_caption("Survival Island")
-pg.display.set_icon(load("assets/icons/Icon.png"))
+pg.display.set_icon(assets["Icon"])
+
+window.blit(assets["Loading Screen1"], (0, 0))
+pg.display.update()
+
+from player import Player, agrivate_inventory
+from land import get_world_from_directory
+
+window.blit(assets["Loading Screen2"], (0, 0))
+pg.display.update()
+
+from time import time
+from objects import Sword
+
+window.blit(assets["Loading Screen3"], (0, 0))
+pg.display.update()
+
+from math import ceil, floor
+
+from EPT import blit_text, Button
+
+window.blit(assets["Loading Screen4"], (0, 0))
+pg.display.update()
+
+from pygame.image import load
+from effects import draw_darkness_filter_at_player
+from ui import render_health
 
 run = True
 clock = pg.time.Clock()
@@ -90,7 +107,6 @@ mouse_down = False
 
 tool_rect = None
 
-
 def display():
     global tool_rect, x_offset, y_offset, gameFPS
 
@@ -137,6 +153,7 @@ def display():
         blit_text(window, averageFPS, (0, healthBarHeight+10))
 
     pg.display.update()
+
 
 while run:
 
