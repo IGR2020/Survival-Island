@@ -86,7 +86,7 @@ mouse_down = False
 tool_rect = None
 
 
-def display(internal_clock):
+def display():
     global tool_rect, x_offset, y_offset, gameFPS
 
     window.fill((29, 117, 139))
@@ -126,20 +126,14 @@ def display(internal_clock):
     attack_button.display(window)
 
     if showDebug:
-        averageFPS = round((clock.get_fps() + internal_clock.get_fps()) / 2)
+        averageFPS = round(clock.get_fps()/ 2)
         blit_text(window, averageFPS, (0, 0))
 
     pg.display.update()
 
-
-display_thread = convert_to_thread(display, gameFPS, True)
-display_thread.start()
-
 while run:
 
     delta_time = clock.tick(gameFPS) / 16
-    if delta_time > 5:
-        delta_time = 0
 
     for event in pg.event.get():
 
@@ -248,6 +242,8 @@ while run:
         )
         if player.colliderect(monster):
             player.hit(monster.damage)
+
+    display()
 
 pg.quit()
 quit()

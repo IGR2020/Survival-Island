@@ -32,3 +32,4 @@ Beta 2
 
 Android Version 1.0
     + all action preformable with touchscreen
+    + threading fix
