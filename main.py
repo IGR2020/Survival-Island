@@ -5,13 +5,16 @@ from assets import *
 from time import time
 from objects import Sword
 from math import ceil, floor
-from EPT import blit_text, convert_to_thread, Button
+from EPT import blit_text, Button
 from pygame.image import load
 from effects import draw_darkness_filter_at_player
 from ui import render_health
+import tkinter
+
+MONITER_WIDTH, MONITER_HEIGHT = tkinter.Tk().winfo_screenwidth(), tkinter.Tk().winfo_screenheight()
 
 WIDTH, HEIGHT = 900, 500
-window = pg.display.set_mode((WIDTH, HEIGHT), pg.RESIZABLE)
+window = pg.display.set_mode((WIDTH, HEIGHT), flags=pg.RESIZABLE)
 pg.display.set_caption("Survival Island")
 pg.display.set_icon(load("assets/icons/Icon.png"))
 
@@ -26,6 +29,8 @@ down_button = Button((button_size, HEIGHT - button_size), assets["Down Button"])
 left_button = Button((0, HEIGHT - button_size*2), assets["Left Button"])
 right_button = Button((button_size*2, HEIGHT - button_size*2), assets["Right Button"])
 attack_button = Button((WIDTH - button_size*2, HEIGHT - button_size*2), assets["Attack Button"])
+maximise_button = Button((WIDTH-button_size, 0), assets["Maximise"])
+f3_button = Button((WIDTH-button_size*2, 0), assets["F3"])
 
 portal_travel_cooldown = 0.5
 portal_time = time()
@@ -124,10 +129,12 @@ def display():
     left_button.display(window)
     right_button.display(window)
     attack_button.display(window)
+    maximise_button.display(window)
+    f3_button.display(window)
 
     if showDebug:
-        averageFPS = round(clock.get_fps()/ 2)
-        blit_text(window, averageFPS, (0, 0))
+        averageFPS = round(clock.get_fps())
+        blit_text(window, averageFPS, (0, healthBarHeight+10))
 
     pg.display.update()
 
@@ -139,10 +146,7 @@ while run:
 
         if event.type == pg.QUIT:
             run = False
-
-        if event.type == pg.VIDEORESIZE:
-            WIDTH, HEIGHT = event.dict["size"]
-            assets["Filter"] = pg.surface.Surface((WIDTH, HEIGHT))
+            
 
         if event.type == pg.MOUSEBUTTONDOWN:
             mouse_down = True
@@ -154,16 +158,32 @@ while run:
                     player.selected_slot = i
                     break
 
-        if event.type == pg.MOUSEBUTTONUP:
-            mouse_down = False
-
-        if event.type == pg.KEYDOWN:
-
-            if event.key == pg.K_F3:
+            if f3_button.clicked():
                 showDebug = not showDebug
 
-            if event.unicode == "~":
-                showDarkness = not showDarkness
+            # Resize Support
+            if maximise_button.clicked():
+                pg.display.set_mode((MONITER_WIDTH, MONITER_HEIGHT), pg.RESIZABLE)
+                WIDTH, HEIGHT = MONITER_WIDTH, MONITER_HEIGHT
+                assets["Filter"] = pg.surface.Surface((WIDTH, HEIGHT))
+                
+                for i, x in enumerate(range(round((WIDTH*0.22)/slotSize), round((WIDTH-WIDTH*0.22)/slotSize))):
+
+                    if i == len(player.inventory):
+                        break
+
+                    player.inventory[i].topleft = x * slotSize, HEIGHT - slotSize
+
+                up_button = Button((button_size, HEIGHT - button_size*3), assets["Up Button"])
+                down_button = Button((button_size, HEIGHT - button_size), assets["Down Button"])
+                left_button = Button((0, HEIGHT - button_size*2), assets["Left Button"])
+                right_button = Button((button_size*2, HEIGHT - button_size*2), assets["Right Button"])
+                attack_button = Button((WIDTH - button_size*2, HEIGHT - button_size*2), assets["Attack Button"])
+                maximise_button = Button((WIDTH-button_size, 0), assets["Maximise"])
+
+
+        if event.type == pg.MOUSEBUTTONUP:
+            mouse_down = False
 
     if mouse_down:
         offset_mouse_x, offset_mouse_y = pg.mouse.get_pos()
@@ -206,6 +226,7 @@ while run:
         if down_button.clicked():
             player.moveDown()
             player.isMovingV = True
+            
 
     player.script(land, delta_time)
     x_offset, y_offset = player.x - WIDTH / 2, player.y - HEIGHT / 2
