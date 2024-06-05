@@ -33,3 +33,5 @@ Beta 2
 Android Version 1.0
     + all action preformable with touchscreen
     + threading fix
+    + resolution scaling to match moniter resolution
+    + loading screen

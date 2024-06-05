@@ -1,11 +1,21 @@
 import pygame as pg
-import tkinter
 from assets import *
 
-MONITER_WIDTH, MONITER_HEIGHT = tkinter.Tk().winfo_screenwidth(), tkinter.Tk().winfo_screenheight()
+moniter_resolutions = pg.display.list_modes()
+target_resolution = 900, 500
+closest_distance = float('inf')
+closest_matching_resolution = None
 
-WIDTH, HEIGHT = 900, 500
-window = pg.display.set_mode((WIDTH, HEIGHT), flags=pg.RESIZABLE)
+for t in moniter_resolutions:
+    distance = (target_resolution[0] - t[0]) ** 2 + (target_resolution[1] - t[1]) ** 2
+    if distance < closest_distance:
+        closest_distance = distance
+        closest_matching_resolution = t
+
+print(closest_matching_resolution)
+
+WIDTH, HEIGHT = closest_matching_resolution
+window = pg.display.set_mode((WIDTH, HEIGHT), pg.FULLSCREEN)
 pg.display.set_caption("Survival Island")
 pg.display.set_icon(assets["Icon"])
 
@@ -14,26 +24,21 @@ pg.display.update()
 
 from player import Player, agrivate_inventory
 from land import get_world_from_directory
+from time import time
+from objects import Sword
 
 window.blit(assets["Loading Screen2"], (0, 0))
 pg.display.update()
 
-from time import time
-from objects import Sword
+from EPT import blit_text, Button
+from pygame.image import load
+from effects import draw_darkness_filter_at_player
+from ui import render_health
 
 window.blit(assets["Loading Screen3"], (0, 0))
 pg.display.update()
 
 from math import ceil, floor
-
-from EPT import blit_text, Button
-
-window.blit(assets["Loading Screen4"], (0, 0))
-pg.display.update()
-
-from pygame.image import load
-from effects import draw_darkness_filter_at_player
-from ui import render_health
 
 run = True
 clock = pg.time.Clock()
@@ -46,7 +51,7 @@ down_button = Button((button_size, HEIGHT - button_size), assets["Down Button"])
 left_button = Button((0, HEIGHT - button_size*2), assets["Left Button"])
 right_button = Button((button_size*2, HEIGHT - button_size*2), assets["Right Button"])
 attack_button = Button((WIDTH - button_size*2, HEIGHT - button_size*2), assets["Attack Button"])
-maximise_button = Button((WIDTH-button_size, 0), assets["Maximise"])
+close_button = Button((WIDTH-button_size, 0), assets["Close"])
 f3_button = Button((WIDTH-button_size*2, 0), assets["F3"])
 
 portal_travel_cooldown = 0.5
@@ -59,6 +64,9 @@ player.inventory[0].item = Sword(name="Magma Sword")
 current_land = 0
 
 correction_angle = 45
+
+window.blit(assets["Loading Screen4"], (0, 0))
+pg.display.update()
 
 word = get_world_from_directory("assets/land presets", True, True)
 
@@ -82,6 +90,12 @@ def save_current_world():
 
 land, structures, spawn, spawners, monsters = load_current_world()
 player.topleft = spawn
+# Rescaling
+for i, x in enumerate(range(round((WIDTH*0.22)/slotSize), round((WIDTH-WIDTH*0.22)/slotSize))):
+                if i == len(player.inventory):
+                    break
+                player.inventory[i].topleft = x * slotSize, HEIGHT - slotSize
+
 
 
 def mapBlocks(x_offset, y_offset):
@@ -145,7 +159,7 @@ def display():
     left_button.display(window)
     right_button.display(window)
     attack_button.display(window)
-    maximise_button.display(window)
+    close_button.display(window)
     f3_button.display(window)
 
     if showDebug:
@@ -175,28 +189,11 @@ while run:
                     player.selected_slot = i
                     break
 
+            if close_button.clicked():
+                run = False
+
             if f3_button.clicked():
                 showDebug = not showDebug
-
-            # Resize Support
-            if maximise_button.clicked():
-                pg.display.set_mode((MONITER_WIDTH, MONITER_HEIGHT), pg.RESIZABLE)
-                WIDTH, HEIGHT = MONITER_WIDTH, MONITER_HEIGHT
-                assets["Filter"] = pg.surface.Surface((WIDTH, HEIGHT))
-                
-                for i, x in enumerate(range(round((WIDTH*0.22)/slotSize), round((WIDTH-WIDTH*0.22)/slotSize))):
-
-                    if i == len(player.inventory):
-                        break
-
-                    player.inventory[i].topleft = x * slotSize, HEIGHT - slotSize
-
-                up_button = Button((button_size, HEIGHT - button_size*3), assets["Up Button"])
-                down_button = Button((button_size, HEIGHT - button_size), assets["Down Button"])
-                left_button = Button((0, HEIGHT - button_size*2), assets["Left Button"])
-                right_button = Button((button_size*2, HEIGHT - button_size*2), assets["Right Button"])
-                attack_button = Button((WIDTH - button_size*2, HEIGHT - button_size*2), assets["Attack Button"])
-                maximise_button = Button((WIDTH-button_size, 0), assets["Maximise"])
 
 
         if event.type == pg.MOUSEBUTTONUP:
