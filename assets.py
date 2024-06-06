@@ -25,6 +25,7 @@ assets.update(load_assets("assets/effects"))
 assets.update(load_assets("assets/icons"))
 assets.update(load_assets("assets/icons/buttons", (button_size, button_size)))
 assets.update(load_assets("assets/icons/main menu/buttons", (button_size*menu_scale, button_size*menu_scale)))
+assets.update(load_assets("assets/icons/main menu", None, 3))
 with open("object data/items/weapons.json") as file:
     data = json.load(file)
     file.close()

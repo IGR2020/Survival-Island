@@ -27,6 +27,20 @@ if exit_code == "quit":
     pg.quit()
     quit()
 
+target_resolution = menu_instance.target_resolution
+closest_distance = float("inf")
+closest_matching_resolution = None
+
+for t in moniter_resolutions:
+    distance = (target_resolution[0] - t[0]) ** 2 + (target_resolution[1] - t[1]) ** 2
+    if distance < closest_distance:
+        closest_distance = distance
+        closest_matching_resolution = t
+
+
+WIDTH, HEIGHT = closest_matching_resolution
+window = pg.display.set_mode((WIDTH, HEIGHT), pg.FULLSCREEN)
+
 
 window.fill((0, 0, 0))
 
