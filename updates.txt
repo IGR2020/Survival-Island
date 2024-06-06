@@ -29,11 +29,3 @@ Beta 2
     + proformance upgrades (old ?/69 new 72 on map 1 and old 55 new 67 on big map)
     + sword alignment fixed
     + hotbar selection
-
-Android Version 1.0
-    + all action preformable with touchscreen
-    + threading fix
-    + resolution scaling to match moniter resolution
-    + loading screen
-    + main menu
-    + multi button clicking

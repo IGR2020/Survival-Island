@@ -12,8 +12,6 @@ player_width = 18
 player_height = 42
 item_size = 32
 item_asset_size = 16
-button_size = 48
-menu_scale = 2
 
 assets = {}
 assets.update(load_assets("assets/objects", None, treeSize/9))
@@ -23,8 +21,6 @@ assets.update(load_assets("assets/items", None, 2))
 assets.update(load_assets("assets/players/Robot", (player_width, player_height), getSubDirsAsList=True))
 assets.update(load_assets("assets/effects"))
 assets.update(load_assets("assets/icons"))
-assets.update(load_assets("assets/icons/buttons", (button_size, button_size)))
-assets.update(load_assets("assets/icons/main menu/buttons", (button_size*menu_scale, button_size*menu_scale)))
 with open("object data/items/weapons.json") as file:
     data = json.load(file)
     file.close()
@@ -53,7 +49,6 @@ healthBarWidth = 100
 healthBarHeight = 25
 
 hitCooldown = 0.3
-swordRotateSpeed = 15
 
 slotSize = 48
 playerHotbarSlots = list(range(10))

@@ -40,8 +40,6 @@ class Player(pg.Rect):
         self.maxHealth = 50
         self.is_hit = False
         self.timeSinceLastHit = time()
-
-        self.is_attacking = False
         
         return super().__init__(
             x, y, assets[self.name].get_width(), assets[self.name].get_height()
