@@ -26,8 +26,9 @@ class Button(pygame.Rect):
         else:
             self.info = args
 
-    def clicked(self):
-        pos = pygame.mouse.get_pos()
+    def clicked(self, pos=None):
+        if pos is None:
+            pos = pygame.mouse.get_pos()
         if self.collidepoint(pos):
             return True
         return False
