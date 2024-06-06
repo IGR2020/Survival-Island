@@ -35,3 +35,5 @@ Android Version 1.0
     + threading fix
     + resolution scaling to match moniter resolution
     + loading screen
+    + main menu
+    + multi button clicking

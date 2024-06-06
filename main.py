@@ -1,9 +1,10 @@
 import pygame as pg
 from assets import *
 
+
 moniter_resolutions = pg.display.list_modes()
 target_resolution = 900, 500
-closest_distance = float('inf')
+closest_distance = float("inf")
 closest_matching_resolution = None
 
 for t in moniter_resolutions:
@@ -12,12 +13,23 @@ for t in moniter_resolutions:
         closest_distance = distance
         closest_matching_resolution = t
 
-print(closest_matching_resolution)
 
 WIDTH, HEIGHT = closest_matching_resolution
 window = pg.display.set_mode((WIDTH, HEIGHT), pg.FULLSCREEN)
 pg.display.set_caption("Survival Island")
 pg.display.set_icon(assets["Icon"])
+
+from menu import MainMenu
+
+menu_instance = MainMenu()
+exit_code = menu_instance.run(window)
+if exit_code == "quit":
+    pg.quit()
+    quit()
+
+
+window.fill((0, 0, 0))
+
 
 window.blit(assets["Loading Screen1"], (0, 0))
 pg.display.update()
@@ -45,14 +57,21 @@ clock = pg.time.Clock()
 FPS = 60
 
 # Android Support
-button_size = 48
-up_button = Button((button_size, HEIGHT - button_size*3), assets["Up Button"])
+up_button = Button((button_size, HEIGHT - button_size * 3), assets["Up Button"])
 down_button = Button((button_size, HEIGHT - button_size), assets["Down Button"])
-left_button = Button((0, HEIGHT - button_size*2), assets["Left Button"])
-right_button = Button((button_size*2, HEIGHT - button_size*2), assets["Right Button"])
-attack_button = Button((WIDTH - button_size*2, HEIGHT - button_size*2), assets["Attack Button"])
-close_button = Button((WIDTH-button_size, 0), assets["Close"])
-f3_button = Button((WIDTH-button_size*2, 0), assets["F3"])
+left_button = Button((0, HEIGHT - button_size * 2), assets["Left Button"])
+right_button = Button(
+    (button_size * 2, HEIGHT - button_size * 2), assets["Right Button"]
+)
+attack_button = Button(
+    (WIDTH - button_size * 2, HEIGHT - button_size * 2), assets["Attack Button"]
+)
+close_button = Button((WIDTH - button_size, 0), assets["Close"])
+f3_button = Button((WIDTH - button_size * 2, 0), assets["F3"])
+
+
+# multi button support
+finger_clicks = []
 
 portal_travel_cooldown = 0.5
 portal_time = time()
@@ -91,11 +110,13 @@ def save_current_world():
 land, structures, spawn, spawners, monsters = load_current_world()
 player.topleft = spawn
 # Rescaling
-for i, x in enumerate(range(round((WIDTH*0.22)/slotSize), round((WIDTH-WIDTH*0.22)/slotSize))):
-                if i == len(player.inventory):
-                    break
-                player.inventory[i].topleft = x * slotSize, HEIGHT - slotSize
-
+for i, x in enumerate(range(10)):
+    if i == len(player.inventory):
+        break
+    player.inventory[i].topleft = (
+        x * slotSize + round((WIDTH - 10 * slotSize) / 2),
+        HEIGHT - slotSize,
+    )
 
 
 def mapBlocks(x_offset, y_offset):
@@ -118,8 +139,10 @@ def mapBlocks(x_offset, y_offset):
 showDebug = False
 showDarkness = False
 mouse_down = False
+attack_clicked = False
 
 tool_rect = None
+
 
 def display():
     global tool_rect, x_offset, y_offset, gameFPS
@@ -150,8 +173,10 @@ def display():
         draw_darkness_filter_at_player(window, player, x_offset, y_offset)
 
     for i, slot in enumerate(player.inventory):
-        if i == player.selected_slot: slot.display(window, True)
-        else: slot.display(window, False)
+        if i == player.selected_slot:
+            slot.display(window, True)
+        else:
+            slot.display(window, False)
     render_health(window, player.health, player.maxHealth, (0, 0))
 
     up_button.display(window)
@@ -164,7 +189,7 @@ def display():
 
     if showDebug:
         averageFPS = round(clock.get_fps())
-        blit_text(window, averageFPS, (0, healthBarHeight+10))
+        blit_text(window, averageFPS, (0, healthBarHeight + 10))
 
     pg.display.update()
 
@@ -177,41 +202,38 @@ while run:
 
         if event.type == pg.QUIT:
             run = False
-            
 
         if event.type == pg.MOUSEBUTTONDOWN:
             mouse_down = True
 
-            mouse_pos = pg.mouse.get_pos()
 
-            for i, slot in enumerate(player.inventory):
-                if slot.collidepoint(mouse_pos):
-                    player.selected_slot = i
-                    break
+        if event.type == pg.FINGERDOWN:
+            finger_clicks.append(event.dict)
 
-            if close_button.clicked():
-                run = False
+            for click in finger_clicks:
+                
+                for i, slot in enumerate(player.inventory):
+                    if slot.collidepoint((click["x"]*WIDTH, click["y"]*HEIGHT)):
+                        player.selected_slot = i
+                        break
 
-            if f3_button.clicked():
-                showDebug = not showDebug
+                if close_button.clicked((click["x"]*WIDTH, click["y"]*HEIGHT)):
+                    run = False
+
+                if f3_button.clicked((click["x"]*WIDTH, click["y"]*HEIGHT)):
+                    showDebug = not showDebug
+
+        if event.type == pg.FINGERUP:
+            for click in finger_clicks:
+                if click["finger_id"] == event.dict["finger_id"]:
+                    finger_clicks.remove(click)
 
 
         if event.type == pg.MOUSEBUTTONUP:
             mouse_down = False
 
     if mouse_down:
-        offset_mouse_x, offset_mouse_y = pg.mouse.get_pos()
-        offset_mouse_x += x_offset
-        offset_mouse_y += y_offset
-        for structure in structures:
-            if structure.collidepoint((offset_mouse_x, offset_mouse_y)):
-                gain = structure.destroy()
-                if gain is not None:
-                    player.inventory = agrivate_inventory(player.inventory, gain)
-                    structures.remove(structure)
-                break
-        else:
-            if attack_button.clicked() and tool_rect is not None:
+        if player.is_attacking and tool_rect is not None:
                 if player.inventory[player.selected_slot].item is not None:
                     if player.inventory[player.selected_slot].item.type == "Tool":
                         player.inventory[player.selected_slot].item.attack = True
@@ -221,26 +243,47 @@ while run:
                             agrivate_inventory(player.inventory, monster.value)
                             monsters.remove(monster)
                         break
+                else:
+                    offset_mouse_x, offset_mouse_y = pg.mouse.get_pos()
+                    offset_mouse_x += x_offset
+                    offset_mouse_y += y_offset
+                    for structure in structures:
+                        if structure.collidepoint((offset_mouse_x, offset_mouse_y)):
+                            gain = structure.destroy()
+                            if gain is not None:
+                                player.inventory = agrivate_inventory(player.inventory, gain)
+                                structures.remove(structure)
+                            break
     else:
         if player.inventory[player.selected_slot].item is not None:
             if player.inventory[player.selected_slot].item.type == "Tool":
                 player.inventory[player.selected_slot].item.attack = False
-        
 
-    if mouse_down:
-        if left_button.clicked():
+    for click in finger_clicks:
+
+        if left_button.clicked((click["x"]*WIDTH, click["y"]*HEIGHT)):
             player.moveLeft()
             player.isMovingH = True
-        if right_button.clicked():
+
+        if right_button.clicked((click["x"]*WIDTH, click["y"]*HEIGHT)):
             player.moveRight()
             player.isMovingH = True
-        if up_button.clicked():
+
+        if up_button.clicked((click["x"]*WIDTH, click["y"]*HEIGHT)):
             player.moveUp()
             player.isMovingV = True
-        if down_button.clicked():
+
+        if down_button.clicked((click["x"]*WIDTH, click["y"]*HEIGHT)):
             player.moveDown()
             player.isMovingV = True
-            
+        if attack_button.clicked((click["x"]*WIDTH, click["y"]*HEIGHT)):
+            player.is_attacking = True
+            attack_clicked = True
+
+    if attack_clicked:
+        attack_clicked = False
+    else:
+        player.is_attacking = False
 
     player.script(land, delta_time)
     x_offset, y_offset = player.x - WIDTH / 2, player.y - HEIGHT / 2
