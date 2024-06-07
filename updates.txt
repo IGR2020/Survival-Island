@@ -37,3 +37,7 @@ Android Version 1.0
     + loading screen
     + main menu
     + multi button clicking
+
+Beta 3
+    + New Dead Biome
+    + New Dead Tree

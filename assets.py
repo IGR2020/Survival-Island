@@ -45,6 +45,7 @@ assets["Filter"] = pg.surface.Surface((900, 500))
 landChaos = 0.02
 seaChaos = 0.02
 grassChaos = 0.08
+treeDensityChaos = 0.03
 
 spawnerSpeedRange = [i*0.1 for i in range(15, 120)]
 
@@ -56,5 +57,4 @@ healthBarHeight = 25
 hitCooldown = 0.3
 swordRotateSpeed = 15
 
-slotSize = 48
 playerHotbarSlots = list(range(10))

@@ -70,6 +70,10 @@ run = True
 clock = pg.time.Clock()
 FPS = 60
 
+# G.U.I rescaling
+button_size = menu_instance.ui_size
+assets.update(load_assets("assets/icons/buttons", (button_size, button_size)))
+
 # Android Support
 up_button = Button((button_size, HEIGHT - button_size * 3), assets["Up Button"])
 down_button = Button((button_size, HEIGHT - button_size), assets["Down Button"])
@@ -128,8 +132,8 @@ for i, x in enumerate(range(10)):
     if i == len(player.inventory):
         break
     player.inventory[i].topleft = (
-        x * slotSize + round((WIDTH - 10 * slotSize) / 2),
-        HEIGHT - slotSize,
+        x * button_size + round((WIDTH - 10 * button_size) / 2),
+        HEIGHT - button_size,
     )
 
 
