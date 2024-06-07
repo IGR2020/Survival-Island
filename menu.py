@@ -28,8 +28,8 @@ class MainMenu:
             assets["Settings"],
         )
         back_button = Button((0, 0), assets["Back"])
-        text_box_resolution = Button((100, 300), assets["Text Box Inactive"], 1, "900 500")
-        plus_button = Button((text_box_resolution.right, button_size*menu_scale+300), assets["Plus"])
+        text_box_resolution = Button((100, 150), assets["Text Box Inactive"], 1, "900 500")
+        plus_button = Button((text_box_resolution.right - button_size/2, button_size*menu_scale+300), assets["Plus"])
         minus_button = Button((plus_button.right + 150, plus_button.y), assets["Minus"])
         is_typing_resolution = False
         showSettings = False
@@ -49,6 +49,10 @@ class MainMenu:
                     if showSettings:
                         if back_button.clicked():
                             showSettings = False
+                        if plus_button.clicked():
+                            self.ui_size += 2
+                        if minus_button.clicked():
+                            self.ui_size -= 2
                         if text_box_resolution.clicked():
                             is_typing_resolution = True
                             text_box_resolution.image = assets["Text Box Active"]
@@ -80,7 +84,7 @@ class MainMenu:
                     colour=(200, 200, 255),
                     size=35,
                 )
-                blit_text(window, "G.U.I scale", (text_box_resolution.right +  button_size*menu_scale, 300), (190, 190, 255), 50)
+                blit_text(window, "G.U.I scale", (text_box_resolution.right, 300), (190, 190, 255), 50)
                 text_box_resolution.display(window)
                 blit_text(window, text_box_resolution.info, (text_box_resolution.x + text_box_resolution.width/25, text_box_resolution.y + text_box_resolution.height/25))
                 plus_button.display(window)
