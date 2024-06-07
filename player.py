@@ -30,8 +30,8 @@ class Player(pg.Rect):
         self.isMovingV = False
         
         self.inventory = []
-        for x in range(200//slotSize, 700//slotSize):
-            self.inventory.append(Slot(x * slotSize, 500 - slotSize, slotSize, slotSize))
+        for x in range(200//button_size, 700//button_size):
+            self.inventory.append(Slot(x * button_size, 500 - button_size, button_size, button_size))
         self.held = None
         self.selected_slot = 0
         
