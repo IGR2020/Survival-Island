@@ -271,7 +271,18 @@ while run:
                             if gain is not None:
                                 player.inventory = agrivate_inventory(player.inventory, gain)
                                 structures.remove(structure)
-                            break
+                                break
+        else:
+            offset_mouse_x, offset_mouse_y = pg.mouse.get_pos()
+            offset_mouse_x += x_offset
+            offset_mouse_y += y_offset
+            for structure in structures:
+                if structure.collidepoint((offset_mouse_x, offset_mouse_y)):
+                    gain = structure.destroy()
+                    if gain is not None:
+                        player.inventory = agrivate_inventory(player.inventory, gain)
+                        structures.remove(structure)
+                        break                        
     else:
         if player.inventory[player.selected_slot].item is not None:
             if player.inventory[player.selected_slot].item.type == "Tool":
